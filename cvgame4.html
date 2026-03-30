@@ -330,6 +330,13 @@
         <button class="t-btn t-right" id="t-right">▶</button>
         <button class="t-btn t-down" id="t-down">▼</button>
     </div>
+    
+    <div id="t-joystick-zone" style="display: none; position: relative; width: 150px; height: 150px; pointer-events: auto; touch-action: none;">
+        <div id="t-joystick-base" style="position: absolute; top: 15px; left: 15px; width: 120px; height: 120px; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.4); border-radius: 50%; backdrop-filter: blur(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.5);">
+            <div id="t-joystick-stick" style="position: absolute; top: 30px; left: 30px; width: 60px; height: 60px; background: rgba(0, 255, 204, 0.5); border: 2px solid #00ffcc; border-radius: 50%; box-shadow: 0 0 10px #00ffcc; pointer-events: none;"></div>
+        </div>
+    </div>
+
     <div class="t-actions">
         <button class="t-btn t-action" id="t-b">🚀<br><span>(B)</span></button>
         <button class="t-btn t-action" id="t-a">🎯<br><span>(A)</span></button>
@@ -484,6 +491,85 @@ bindTouch('t-left', 'ArrowLeft', 'ArrowLeft');
 bindTouch('t-right', 'ArrowRight', 'ArrowRight');
 bindTouch('t-a', 'Enter', 'Enter');
 bindTouch('t-b', ' ', 'Space');
+
+/* === JOYSTICK DRONE === */
+const joyZone = document.getElementById('t-joystick-zone');
+const joyStick = document.getElementById('t-joystick-stick');
+let joyActive = false;
+let joyRect = null;
+let activeJoyKeys = { up: false, down: false, left: false, right: false };
+
+function setJoyKey(key, code, isDown) {
+    window.dispatchEvent(new KeyboardEvent(isDown ? 'keydown' : 'keyup', { key: key, code: code }));
+}
+
+if (joyZone) {
+    const handleJoy = (e) => {
+        if (!joyActive && e.type !== 'touchstart' && e.type !== 'mousedown') return;
+        if (e.cancelable) e.preventDefault();
+        
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+
+        if (!joyRect) joyRect = joyZone.getBoundingClientRect();
+        
+        let centerX = joyRect.left + 75;
+        let centerY = joyRect.top + 75;
+        
+        let dx = clientX - centerX;
+        let dy = clientY - centerY;
+        let dist = Math.hypot(dx, dy);
+        let maxDist = 40;
+        
+        if (dist > maxDist) {
+            dx = (dx / dist) * maxDist;
+            dy = (dy / dist) * maxDist;
+        }
+        
+        joyStick.style.transition = 'none';
+        joyStick.style.transform = `translate(${dx}px, ${dy}px)`;
+        
+        let up = dy < -10;
+        let down = dy > 10;
+        let left = dx < -10;
+        let right = dx > 10;
+        
+        if (up !== activeJoyKeys.up) { setJoyKey('ArrowUp', 'ArrowUp', up); activeJoyKeys.up = up; }
+        if (down !== activeJoyKeys.down) { setJoyKey('ArrowDown', 'ArrowDown', down); activeJoyKeys.down = down; }
+        if (left !== activeJoyKeys.left) { setJoyKey('ArrowLeft', 'ArrowLeft', left); activeJoyKeys.left = left; }
+        if (right !== activeJoyKeys.right) { setJoyKey('ArrowRight', 'ArrowRight', right); activeJoyKeys.right = right; }
+    };
+
+    const stopJoy = (e) => {
+        if (e && e.cancelable) e.preventDefault();
+        joyActive = false;
+        joyStick.style.transition = 'transform 0.2s ease-out';
+        joyStick.style.transform = `translate(0px, 0px)`;
+        
+        if (activeJoyKeys.up) { setJoyKey('ArrowUp', 'ArrowUp', false); activeJoyKeys.up = false; }
+        if (activeJoyKeys.down) { setJoyKey('ArrowDown', 'ArrowDown', false); activeJoyKeys.down = false; }
+        if (activeJoyKeys.left) { setJoyKey('ArrowLeft', 'ArrowLeft', false); activeJoyKeys.left = false; }
+        if (activeJoyKeys.right) { setJoyKey('ArrowRight', 'ArrowRight', false); activeJoyKeys.right = false; }
+        
+        joyRect = null;
+    };
+
+    joyZone.addEventListener('touchstart', (e) => { joyActive = true; joyRect = joyZone.getBoundingClientRect(); handleJoy(e); }, { passive: false });
+    joyZone.addEventListener('touchmove', handleJoy, { passive: false });
+    joyZone.addEventListener('touchend', stopJoy, { passive: false });
+    joyZone.addEventListener('touchcancel', stopJoy, { passive: false });
+    
+    joyZone.addEventListener('mousedown', (e) => { joyActive = true; joyRect = joyZone.getBoundingClientRect(); handleJoy(e); });
+    window.addEventListener('mousemove', (e) => { if (joyActive) handleJoy(e); });
+    window.addEventListener('mouseup', (e) => { if (joyActive) stopJoy(e); });
+}
+
 
 /* =========================================================================
    PARTIE 1 : MOTEUR RPG (POKEMON)
@@ -691,6 +777,14 @@ function endBattle(won) {
             isRPGActive = false;
             document.getElementById('pokemon-game').style.display = 'none';
             document.getElementById('drone-game').style.display = 'block';
+            
+            // --- REMPLACEMENT CROIX PAR JOYSTICK SUR MOBILE ---
+            const dpad = document.querySelector('.t-dpad');
+            const joy = document.getElementById('t-joystick-zone');
+            if (dpad) dpad.style.display = 'none';
+            if (joy) joy.style.display = 'block';
+            // --------------------------------------------------
+
             droneActive = true;
             buildWorld(); updateDrone();
         });
