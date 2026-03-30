@@ -535,10 +535,11 @@ if (joyZone) {
         joyStick.style.transition = 'none';
         joyStick.style.transform = `translate(${dx}px, ${dy}px)`;
         
-        let up = dy < -10;
-        let down = dy > 10;
-        let left = dx < -10;
-        let right = dx > 10;
+        // --- ZONE MORTE AUGMENTÉE ICI (20 au lieu de 10) ---
+        let up = dy < -20;
+        let down = dy > 20;
+        let left = dx < -20;
+        let right = dx > 20;
         
         if (up !== activeJoyKeys.up) { setJoyKey('ArrowUp', 'ArrowUp', up); activeJoyKeys.up = up; }
         if (down !== activeJoyKeys.down) { setJoyKey('ArrowDown', 'ArrowDown', down); activeJoyKeys.down = down; }
