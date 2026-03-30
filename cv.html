@@ -342,7 +342,7 @@
                 <div x-show="activeExp === 'ilaria_exp'" x-cloak x-transition class="mt-8 pt-8 border-t border-white/5">
                     <p class="text-blue-400 text-[10px] font-black uppercase mb-4 tracking-[0.2em] italic">Missions :
                     </p>
-                    <ul class="text-sm text-slate-400 space-y-3 leading-relaxed">
+                    <ul class="text-sm text-slate-300 space-y-3 leading-relaxed">
                         <li>• Développement d'une plateforme E-learning.</li>
                         <li>• Fonctionnalités : gestion de vidéos (ajout/suppression), calendrier et gestion de tâches.
                         </li>
@@ -382,7 +382,7 @@
                     <div class="flex justify-between items-center">
                         <div>
                             <h3 class="text-lg md:text-xl font-extrabold uppercase tracking-tighter">Thales AES</h3>
-                            <p class="text-slate-500 text-[10px] md:text-xs font-bold uppercase mt-1">Ingénieur
+                            <p class="text-slate-400 text-[10px] md:text-xs font-bold uppercase mt-1">Ingénieur
                                 Électronique • 2023</p>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-500 transition-transform"
@@ -411,7 +411,7 @@
                         <div>
                             <h3 class="text-lg md:text-xl font-extrabold uppercase tracking-tighter text-slate-300">
                                 Valeo Cergy</h3>
-                            <p class="text-slate-500 text-[10px] md:text-xs font-bold uppercase mt-1">Ingénieur Hardware
+                            <p class="text-slate-400 text-[10px] md:text-xs font-bold uppercase mt-1">Ingénieur Hardware
                                 • 2022-2023</p>
                         </div>
                         <i class="fa-solid fa-chevron-right text-slate-500 transition-transform"
@@ -443,7 +443,7 @@
                             :class="activeExp === 'emotors' ? 'rotate-90' : ''"></i>
                     </div>
                     <div x-show="activeExp === 'emotors'" x-cloak x-transition
-                        class="mt-8 pt-8 border-t border-white/5 text-sm space-y-3">
+                        class="mt-8 pt-8 border-t text-slate-400  border-white/5 text-sm space-y-3">
                         <p>• Validation de cartes de contrôle sur onduleurs de moteurs électriques.</p>
                         <p>• Tests : Convertisseurs DC/DC flyback, gate drivers, MCU, bus CAN.</p>
                         <p>• Focus circuits safety analogiques (Active short circuit, Active Discharge).</p>
@@ -463,7 +463,7 @@
                             :class="activeExp === 'sagemcom' ? 'rotate-90' : ''"></i>
                     </div>
                     <div x-show="activeExp === 'sagemcom'" x-cloak x-transition
-                        class="mt-8 pt-8 border-t border-white/5 text-sm space-y-3">
+                        class="mt-8 pt-8 border-t text-slate-400  border-white/5 text-sm space-y-3">
                         <p>• Projet vélo électrique : Conception & validation carte feux arrières et IHM.</p>
                         <p>• Schéma sous Mentor (XDX Designer) et gestion des règles de routage complexes.</p>
                         <p>• Qualification ADC, PWM, bus numériques (SPI, CAN) et tests cellules batteries.</p>
@@ -478,8 +478,8 @@
                             class="fa-solid fa-chevron-right"></i>
                     </div>
                     <div x-show="activeExp === 'faurecia'" x-cloak x-transition
-                        class="mt-8 pt-8 border-t border-white/5 text-sm">
-                        Validation et qualification de bancs de tests industriels automobile. Analyse schémas/routage
+                        class="mt-8 pt-8 border-t text-slate-400  border-white/5 text-sm">
+                        Validation de 6 PCB  pour des bancs de tests industriels automobile. Analyse schémas/routage
                         sous Orcad/Cadence. Qualification capteurs, relais, et bus GMSL2.
                     </div>
                 </div>
@@ -492,26 +492,14 @@
                             class="fa-solid fa-chevron-right"></i>
                     </div>
                     <div x-show="activeExp === 'lincoln'" x-cloak x-transition
-                        class="mt-8 pt-8 border-t border-white/5 text-sm space-y-3">
-                        <p>• Conception et tests cycle commande poste de soudure (700 composants).</p>
+                        class="mt-8 pt-8 border-t text-slate-400  border-white/5 text-sm space-y-3">
+                        <p>• Conception et tests cartes cycle commande pour poste de soudure (700 composants).</p>
                         <p>• Simulation PSIM/LTSPICE (conditionnement capteurs).</p>
                         <p>• Design régulateur débit de gaz en boucle fermée par MCU.</p>
                     </div>
                 </div>
 
-                <!-- Centum Adeneo -->
-                <div @click="activeExp = (activeExp === 'centum' ? null : 'centum')"
-                    class="exp-card glass p-6 md:p-8 rounded-[2rem] cursor-pointer text-slate-500">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-lg md:text-xl font-extrabold uppercase tracking-tighter">Centum Adeneo</h3><i
-                            class="fa-solid fa-chevron-right"></i>
-                    </div>
-                    <div x-show="activeExp === 'centum'" x-cloak x-transition
-                        class="mt-8 pt-8 border-t border-white/5 text-sm">
-                        Validation carte communication ACARS aéronautique civile. Support technique et détection erreurs
-                        routage.
-                    </div>
-                </div>
+      
             </div>
             <!-- FIN BLOC HARDWARE DÉTAILLÉ -->
 
