@@ -352,14 +352,15 @@
                     <div class="hp-bar-bg"><div class="hp-bar-fill" id="enemy-hp-fill"></div></div>
                 </div>
                 <!-- Remplacement des Emojis par des SVGs Pixel Art -->
-                <div class="battle-sprite" id="enemy-sprite">
-                    <svg width="80" height="80" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="5" y="2" width="6" height="5" fill="#FFCC99"/><rect x="4" y="1" width="8" height="2" fill="#D8A838"/><rect x="10" y="2" width="2" height="3" fill="#D8A838"/><rect x="6" y="4" width="1" height="1" fill="#000"/><rect x="9" y="4" width="1" height="1" fill="#000"/><rect x="4" y="7" width="8" height="5" fill="#181818"/><rect x="4" y="12" width="3" height="4" fill="#A83030"/><rect x="9" y="12" width="3" height="4" fill="#A83030"/></svg>
+                <div class="battle-sprite" id="enemy-sprite">🕺
+                    <!-- <svg width="80" height="80" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="5" y="2" width="6" height="5" fill="#FFCC99"/><rect x="4" y="1" width="8" height="2" fill="#D8A838"/><rect x="10" y="2" width="2" height="3" fill="#D8A838"/><rect x="6" y="4" width="1" height="1" fill="#000"/><rect x="9" y="4" width="1" height="1" fill="#000"/><rect x="4" y="7" width="8" height="5" fill="#181818"/><rect x="4" y="12" width="3" height="4" fill="#A83030"/><rect x="9" y="12" width="3" height="4" fill="#A83030"/></svg> -->
+    <span style="font-size: 70px;">🕺</span>
                 </div>
             </div>
             
             <div class="battle-top" style="justify-content: flex-start; padding-top: 0;">
                 <div class="battle-sprite" id="player-sprite" style="margin-right: 30px; margin-top: 50px;">
-                    <svg width="100" height="100" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="4" y="2" width="8" height="5" fill="#D83838"/><rect x="6" y="7" width="4" height="1" fill="#FFCC99"/><rect x="3" y="8" width="10" height="5" fill="#3498DB"/><rect x="5" y="9" width="6" height="4" fill="#506858"/><rect x="4" y="13" width="3" height="3" fill="#2C3E50"/><rect x="9" y="13" width="3" height="3" fill="#2C3E50"/></svg>
+                    <svg width="100" height="100" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="3" y="13" width="2" height="3" fill="#F1C40F"/><rect x="6" y="13" width="1" height="3" fill="#F1C40F"/><rect x="9" y="13" width="1" height="3" fill="#F1C40F"/><rect x="11" y="13" width="2" height="3" fill="#F1C40F"/><rect x="1" y="6" width="3" height="1" fill="#F1C40F"/><rect x="1" y="8" width="3" height="1" fill="#F1C40F"/><rect x="12" y="6" width="3" height="1" fill="#F1C40F"/><rect x="12" y="8" width="3" height="1" fill="#F1C40F"/><rect x="4" y="2" width="8" height="11" fill="#1E8449"/><rect x="5" y="3" width="6" height="9" fill="#2ECC71"/><rect x="6" y="6" width="4" height="4" fill="#34495E"/><rect x="7" y="7" width="2" height="2" fill="#E74C3C"/><rect x="5" y="4" width="2" height="1" fill="#BDC3C7"/><rect x="9" y="4" width="2" height="1" fill="#BDC3C7"/><rect x="5" y="11" width="2" height="1" fill="#BDC3C7"/><rect x="9" y="11" width="2" height="1" fill="#BDC3C7"/><rect x="5" y="5" width="1" height="2" fill="#E67E22"/><rect x="10" y="8" width="1" height="2" fill="#3498DB"/></svg>
                 </div>
                 <div class="hp-box" style="margin-top: 80px;">
                     <div id="player-name">Électronique</div>
@@ -581,9 +582,22 @@ function pickElectronique() {
 // ---- COMBAT SYSTEM ----
 let battleType = 'RIVAL'; let enemyHP = 100, playerHP = 100;
 
-const svgRival = `<svg width="80" height="80" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="5" y="2" width="6" height="5" fill="#FFCC99"/><rect x="4" y="1" width="8" height="2" fill="#D8A838"/><rect x="10" y="2" width="2" height="3" fill="#D8A838"/><rect x="6" y="4" width="1" height="1" fill="#000"/><rect x="9" y="4" width="1" height="1" fill="#000"/><rect x="4" y="7" width="8" height="5" fill="#181818"/><rect x="4" y="12" width="3" height="4" fill="#A83030"/><rect x="9" y="12" width="3" height="4" fill="#A83030"/></svg>`;
-const svgWild = `<svg width="80" height="80" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="5" y="2" width="6" height="5" fill="#FFCC99"/><rect x="4" y="1" width="8" height="2" fill="#506858"/><rect x="4" y="4" width="8" height="1" fill="#000"/><rect x="5" y="4" width="2" height="1" fill="#FFF"/><rect x="9" y="4" width="2" height="1" fill="#FFF"/><rect x="4" y="7" width="8" height="5" fill="#58A830"/><rect x="4" y="12" width="3" height="4" fill="#404040"/><rect x="9" y="12" width="3" height="4" fill="#404040"/></svg>`;
-const svgPlayer = `<svg width="100" height="100" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="4" y="2" width="8" height="5" fill="#D83838"/><rect x="6" y="7" width="4" height="1" fill="#FFCC99"/><rect x="3" y="8" width="10" height="5" fill="#3498DB"/><rect x="5" y="9" width="6" height="4" fill="#506858"/><rect x="4" y="13" width="3" height="3" fill="#2C3E50"/><rect x="9" y="13" width="3" height="3" fill="#2C3E50"/></svg>`;
+// const svgRival = `<svg width="80" height="80" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="5" y="2" width="6" height="5" fill="#FFCC99"/><rect x="4" y="1" width="8" height="2" fill="#D8A838"/><rect x="10" y="2" width="2" height="3" fill="#D8A838"/><rect x="6" y="4" width="1" height="1" fill="#000"/><rect x="9" y="4" width="1" height="1" fill="#000"/><rect x="4" y="7" width="8" height="5" fill="#181818"/><rect x="4" y="12" width="3" height="4" fill="#A83030"/><rect x="9" y="12" width="3" height="4" fill="#A83030"/></svg>`;
+const svgRival = `<span style="font-size: 70px;">🕺</span>`;
+
+const svgWild = `<svg width="80" height="80" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="6" y="12" width="4" height="2" fill="#7F8C8D"/><rect x="4" y="14" width="8" height="1" fill="#95A5A6"/><rect x="2" y="3" width="12" height="9" fill="#2C3E50"/><rect x="3" y="4" width="10" height="7" fill="#1A1A1A"/><rect x="4" y="5" width="4" height="1" fill="#2ECC71"/><rect x="4" y="6" width="6" height="1" fill="#3498DB"/><rect x="4" y="8" width="5" height="1" fill="#E74C3C"/><rect x="4" y="9" width="3" height="1" fill="#F1C40F"/><rect x="8" y="9" width="4" height="1" fill="#2ECC71"/><rect x="5" y="7" width="1" height="1" fill="#FFF"/><rect x="10" y="7" width="1" height="1" fill="#FFF"/><rect x="3" y="15" width="10" height="1" fill="#BDC3C7"/><rect x="4" y="15" width="1" height="1" fill="#E74C3C"/><rect x="6" y="15" width="3" height="1" fill="#7F8C8D"/><rect x="10" y="15" width="2" height="1" fill="#7F8C8D"/></svg>`;
+
+const svgPlayer = `<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="cpu" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#475569"/><stop offset="100%" stop-color="#0F172A"/></linearGradient></defs>
+  <path d="M25 15v5m10-5v5m30-5v5m10-5v5M15 25h5m-5 10h5m-5 30h5m-5 10h5M85 25h-5m5 10h-5m5 30h-5m5 10h-5M25 85v-5m10 5v-5m30 5v-5m10 5v-5" stroke="#D97706" stroke-width="3"/>
+  <rect x="20" y="20" width="60" height="60" rx="4" fill="#0B4627" stroke="#042F1A" stroke-width="2"/>
+  <path d="M50 50 L30 30 H22 M50 50 L70 30 H78 M50 50 L30 70 H22 M50 50 L70 70 H78 M50 20v15M50 80v-15" fill="none" stroke="#34D399" stroke-width="1.5"/>
+  <circle cx="22" cy="30" r="1.5" fill="#34D399"/><circle cx="78" cy="30" r="1.5" fill="#34D399"/><circle cx="22" cy="70" r="1.5" fill="#34D399"/><circle cx="78" cy="70" r="1.5" fill="#34D399"/>
+  <rect x="35" y="35" width="30" height="30" rx="3" fill="url(#cpu)" stroke="#94A3B8" stroke-width="1"/>
+  <path d="M38 38h4v4h-4z m20 0h4v4h-4z m-20 20h4v4h-4z m20 0h4v4h-4z" fill="#E2E8F0"/>
+  <rect x="42" y="45" width="16" height="8" rx="3" fill="#000"/>
+  <circle cx="46" cy="49" r="2" fill="#00FFFF"/><circle cx="54" cy="49" r="2" fill="#00FFFF"/>
+</svg>`;
 
 function startBattle(type) {
     rpgState = 'BATTLE'; battleType = type;
@@ -772,9 +786,21 @@ function drawRPG() {
                 }
             } else { 
                 if (t === 3) { 
+                    // Herbe améliorée
                     ctx.fillStyle = '#78C850'; ctx.fillRect(px, py, TILE, TILE);
-                    ctx.fillStyle = '#58A830'; ctx.fillRect(px+8, py+8, 8, 8); ctx.fillRect(px+24, py+24, 8, 8);
-                    ctx.fillStyle = '#90E068'; ctx.fillRect(px+8, py+8, 4, 4); ctx.fillRect(px+24, py+24, 4, 4);
+                    // Brins d'herbe sombres
+                    ctx.fillStyle = '#58A830'; 
+                    // Touffe 1
+                    ctx.fillRect(px+4, py+4, 2, 6); ctx.fillRect(px+2, py+6, 2, 4); ctx.fillRect(px+6, py+6, 2, 4);
+                    // Touffe 2
+                    ctx.fillRect(px+24, py+20, 2, 6); ctx.fillRect(px+22, py+22, 2, 4); ctx.fillRect(px+26, py+22, 2, 4);
+                    // Touffe 3
+                    ctx.fillRect(px+16, py+28, 2, 6); ctx.fillRect(px+14, py+30, 2, 4); ctx.fillRect(px+18, py+30, 2, 4);
+                    // Touffe 4
+                    ctx.fillRect(px+28, py+6, 2, 4); ctx.fillRect(px+26, py+8, 2, 2); ctx.fillRect(px+30, py+8, 2, 2);
+                    // Reflets clairs
+                    ctx.fillStyle = '#90E068'; 
+                    ctx.fillRect(px+4, py+6, 2, 2); ctx.fillRect(px+24, py+22, 2, 2); ctx.fillRect(px+16, py+30, 2, 2); ctx.fillRect(px+28, py+8, 2, 2);
                 } else if (t === 0) { 
                     ctx.fillStyle = '#E0C8A0'; ctx.fillRect(px, py, TILE, TILE);
                     ctx.fillStyle = '#C8A878'; 
@@ -856,12 +882,33 @@ function drawRPG() {
 
         // Jambes
         ctx.fillStyle = bot;
-        ctx.fillRect(px - 5, cy + 6, 4, 6); ctx.strokeRect(px - 5, cy + 6, 4, 6);
-        ctx.fillRect(px + 1, cy + 6, 4, 6); ctx.strokeRect(px + 1, cy + 6, 4, 6);
+        ctx.fillRect(px - 6, cy + 6, 5, 5); ctx.strokeRect(px - 6, cy + 6, 5, 5); // Jambe gauche
+        ctx.fillRect(px + 1, cy + 6, 5, 5); ctx.strokeRect(px + 1, cy + 6, 5, 5); // Jambe droite
+
+        // Chaussures
+        ctx.fillStyle = isPlayer ? '#D83838' : '#333';
+        ctx.fillRect(px - 7, cy + 11, 6, 3); ctx.strokeRect(px - 7, cy + 11, 6, 3); // Chaussure gauche
+        ctx.fillRect(px + 1, cy + 11, 6, 3); ctx.strokeRect(px + 1, cy + 11, 6, 3); // Chaussure droite
 
         // Corps
         ctx.fillStyle = top;
         ctx.fillRect(px - 7, cy - 4, 14, 10); ctx.strokeRect(px - 7, cy - 4, 14, 10);
+        
+        // Ceinture / Detail Corps
+        ctx.fillStyle = '#202020';
+        ctx.fillRect(px - 6, cy + 4, 12, 2); 
+        ctx.fillStyle = '#F8D030'; // Boucle de ceinture
+        ctx.fillRect(px - 2, cy + 3, 4, 3);
+
+        // Bras
+        ctx.fillStyle = top;
+        ctx.fillRect(px - 10, cy - 3, 3, 8); ctx.strokeRect(px - 10, cy - 3, 3, 8); // Bras gauche
+        ctx.fillRect(px + 7, cy - 3, 3, 8); ctx.strokeRect(px + 7, cy - 3, 3, 8); // Bras droit
+        
+        // Mains
+        ctx.fillStyle = skin;
+        ctx.fillRect(px - 10, cy + 5, 3, 3); ctx.strokeRect(px - 10, cy + 5, 3, 3);
+        ctx.fillRect(px + 7, cy + 5, 3, 3); ctx.strokeRect(px + 7, cy + 5, 3, 3);
 
         // Tête
         ctx.fillStyle = skin;
@@ -869,32 +916,38 @@ function drawRPG() {
 
         // Cheveux / Chapeau
         if (hasHat) {
-            ctx.fillStyle = '#D83838';
-            ctx.fillRect(px - 6, cy - 16, 12, 4);
-            ctx.fillStyle = '#F8F8F8';
-            ctx.fillRect(px - 3, cy - 16, 6, 4);
-            ctx.fillStyle = '#D83838';
-            if(player.dir === 'LEFT') ctx.fillRect(px - 10, cy - 12, 6, 2);
-            else if(player.dir === 'RIGHT') ctx.fillRect(px + 4, cy - 12, 6, 2);
-            else if(player.dir === 'DOWN') ctx.fillRect(px - 8, cy - 12, 16, 2);
+            ctx.fillStyle = '#D83838'; // Base de la casquette
+            ctx.fillRect(px - 7, cy - 17, 14, 5); ctx.strokeRect(px - 7, cy - 17, 14, 5);
+            ctx.fillStyle = '#F8F8F8'; // Devant de la casquette
+            ctx.fillRect(px - 4, cy - 17, 8, 4);
+            ctx.fillStyle = '#D83838'; // Visière
+            if(player.dir === 'LEFT') { ctx.fillRect(px - 11, cy - 13, 7, 2); ctx.strokeRect(px - 11, cy - 13, 7, 2); }
+            else if(player.dir === 'RIGHT') { ctx.fillRect(px + 4, cy - 13, 7, 2); ctx.strokeRect(px + 4, cy - 13, 7, 2); }
+            else if(player.dir === 'DOWN') { ctx.fillRect(px - 8, cy - 13, 16, 2); ctx.strokeRect(px - 8, cy - 13, 16, 2); }
         } else {
             ctx.fillStyle = hair;
-            ctx.fillRect(px - 7, cy - 15, 14, 4);
-            ctx.fillRect(px - 7, cy - 12, 3, 4);
-            ctx.fillRect(px + 4, cy - 12, 3, 4);
+            ctx.fillRect(px - 8, cy - 16, 16, 5); ctx.strokeRect(px - 8, cy - 16, 16, 5); // Volume cheveux haut
+            ctx.fillRect(px - 8, cy - 11, 4, 5); // Patte gauche
+            ctx.fillRect(px + 4, cy - 11, 4, 5); // Patte droite
         }
 
-        // Yeux
+        // Yeux (plus expressifs)
         ctx.fillStyle = '#000';
         let isBack = isPlayer && player.dir === 'UP';
         if (!isBack) {
+            ctx.fillStyle = '#FFF'; // Blanc des yeux
             if (isPlayer && player.dir === 'LEFT') {
-                ctx.fillRect(px - 4, cy - 10, 2, 2);
+                ctx.fillRect(px - 5, cy - 10, 3, 3);
+                ctx.fillStyle = '#000'; ctx.fillRect(px - 5, cy - 9, 2, 2);
             } else if (isPlayer && player.dir === 'RIGHT') {
-                ctx.fillRect(px + 2, cy - 10, 2, 2);
+                ctx.fillRect(px + 2, cy - 10, 3, 3);
+                ctx.fillStyle = '#000'; ctx.fillRect(px + 3, cy - 9, 2, 2);
             } else {
-                ctx.fillRect(px - 3, cy - 10, 2, 2);
-                ctx.fillRect(px + 1, cy - 10, 2, 2);
+                ctx.fillRect(px - 4, cy - 10, 3, 3);
+                ctx.fillRect(px + 1, cy - 10, 3, 3);
+                ctx.fillStyle = '#000';
+                ctx.fillRect(px - 3, cy - 9, 2, 2);
+                ctx.fillRect(px + 1, cy - 9, 2, 2);
             }
         }
     };
