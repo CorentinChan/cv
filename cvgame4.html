@@ -14,7 +14,7 @@
             margin: 0; padding: 0; width: 100%; height: 100%;
             overflow: hidden; background-color: #000;
             user-select: none;
-            touch-action: none; /* Empêche le scroll natif sur mobile */
+            touch-action: none; 
         }
 
         /* --- JEU POKEMON (RPG) --- */
@@ -26,59 +26,103 @@
 
         #rpg-container {
             position: relative; width: 640px; height: 480px;
-            background: #78C850; border: 4px solid #fff; border-radius: 8px;
-            overflow: hidden; box-shadow: 0 0 20px rgba(255,255,255,0.2);
+            background: #000; 
+            border: 12px solid #D8D8D8; 
+            border-radius: 10px 10px 50px 10px; 
+            overflow: hidden; 
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 30px rgba(255,255,255,0.2);
             image-rendering: pixelated;
         }
 
         canvas { display: block; width: 100%; height: 100%; }
 
         #dialog-box {
-            position: absolute; bottom: 10px; left: 10px; right: 10px; height: 100px;
-            background: #fff; border: 4px solid #333; border-radius: 8px;
-            padding: 15px; font-size: 14px; line-height: 1.5; color: #000;
-            display: none; box-shadow: 0 4px 0 #ccc inset; z-index: 10;
+            position: absolute; bottom: 15px; left: 15px; right: 15px; height: 90px;
+            background: #F8F8F8; border: 4px solid #506860; border-radius: 8px;
+            padding: 15px; font-size: 12px; line-height: 1.8; color: #303030;
+            display: none; 
+            box-shadow: inset 0 0 0 4px #D8A838, inset 0 0 0 6px #506860, 0 4px 10px rgba(0,0,0,0.4); 
+            z-index: 10; text-shadow: 1px 1px 0px #DDD;
         }
         #dialog-text { display: inline-block; }
-        .blinking-cursor { animation: blink 1s infinite; }
-        @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+        
+        .blinking-cursor { 
+            display: inline-block;
+            width: 0; height: 0; 
+            border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid #D83838;
+            animation: bounce 0.5s infinite alternate; margin-left: 5px;
+            vertical-align: middle;
+        }
+        @keyframes bounce { 0% { transform: translateY(0); } 100% { transform: translateY(4px); } }
 
+        /* Interface Combat Façon GBA */
         #battle-screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #f8f8f8; display: none; z-index: 20;
+            background: linear-gradient(to bottom, #A0D8F8 0%, #A0D8F8 55%, #78C850 55%, #78C850 100%);
+            display: none; z-index: 20;
             flex-direction: column; justify-content: space-between;
         }
         
-        .battle-top { display: flex; justify-content: space-between; padding: 20px; }
-        .battle-sprite { font-size: 80px; text-shadow: 5px 5px 0 #ccc; }
+        .battle-top { display: flex; justify-content: space-between; padding: 20px; position: relative; }
+        
+        .battle-sprite { 
+            display: flex; align-items: center; justify-content: center;
+            width: 100px; height: 100px; 
+            animation: battleBob 2s infinite ease-in-out;
+            position: relative; z-index: 5;
+        }
+        @keyframes battleBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        
+        #enemy-sprite::after {
+            content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
+            width: 140px; height: 40px; background: #D8E8B8; border: 4px solid #A8C878;
+            border-radius: 50%; z-index: -1; box-shadow: 0 5px 0 rgba(0,0,0,0.1);
+        }
+        #player-sprite::after {
+            content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
+            width: 180px; height: 50px; background: #A0D870; border: 4px solid #58A830;
+            border-radius: 50%; z-index: -1; box-shadow: 0 5px 0 rgba(0,0,0,0.2);
+        }
         
         .hp-box {
-            background: #fff; border: 3px solid #333; padding: 10px;
-            width: 200px; border-radius: 8px; font-size: 12px;
+            background: #F8F8F8; border: 4px solid #506860; 
+            border-bottom-right-radius: 12px; border-top-left-radius: 12px;
+            padding: 10px; width: 220px; font-size: 11px; color: #303030;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
         }
-        .hp-bar-bg { background: #333; height: 10px; width: 100%; margin-top: 5px; border-radius: 5px; overflow: hidden; }
-        .hp-bar-fill { background: #48D0B0; height: 100%; width: 100%; transition: width 0.3s; }
+        .hp-bar-bg { 
+            background: #506858; height: 12px; width: 100%; margin-top: 8px; 
+            border-radius: 6px; border: 2px solid #282828; padding: 1px; box-sizing: border-box; 
+        }
+        .hp-bar-fill { 
+            background: #48D0B0; height: 100%; width: 100%; 
+            border-radius: 3px; transition: width 0.3s, background-color 0.3s; 
+        }
         
         #battle-log {
             flex-grow: 1; display: flex; align-items: center; justify-content: center;
-            font-size: 14px; padding: 20px; text-align: center; color: #333;
+            font-size: 14px; padding: 20px; text-align: center; color: #FFF;
+            text-shadow: 2px 2px 0 #333; font-weight: bold;
         }
 
         #battle-menu {
-            height: 120px; background: #fff; border-top: 4px solid #333;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px;
+            height: 120px; background: #F8F8F8; border-top: 6px solid #506860;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px;
+            box-shadow: inset 0 4px 0 #D8A838; border-bottom-right-radius: 35px;
         }
         .battle-btn {
-            font-family: 'Press Start 2P', monospace; font-size: 12px;
-            background: #eee; border: 3px solid #333; cursor: pointer;
-            border-radius: 5px; text-transform: uppercase;
+            font-family: 'Press Start 2P', monospace; font-size: 12px; color: #303030;
+            background: #FFF; border: 3px solid #506860; cursor: pointer;
+            border-radius: 6px; text-transform: uppercase; box-shadow: 2px 2px 0 #D8A838;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
-        .battle-btn:hover { background: #ddd; }
-        .battle-btn:active { background: #ccc; }
+        .battle-btn:hover { background: #F0F0F0; }
+        .battle-btn:active { background: #E0E0E0; transform: translate(2px, 2px); box-shadow: 0 0 0 transparent; }
 
         .battle-flash {
             position: absolute; top:0; left:0; width:100%; height:100%;
             background: white; opacity: 0; pointer-events: none; z-index: 30;
+            transition: opacity 0.1s;
         }
 
         /* --- JEU DRONE FPV --- */
@@ -196,7 +240,7 @@
            AJOUTS RESPONSIVE MOBILE & BOUTONS TACTILES
            ========================================================================= */
         #touch-controls {
-            display: none; /* Masqué par défaut sur desktop */
+            display: none; 
             position: fixed;
             bottom: 25px;
             left: 0;
@@ -209,62 +253,23 @@
             pointer-events: none;
         }
 
-        .t-dpad {
-            position: relative;
-            width: 150px;
-            height: 150px;
-            pointer-events: auto;
-        }
+        .t-dpad { position: relative; width: 150px; height: 150px; pointer-events: auto; }
 
         .t-btn {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            color: white;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: none;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            cursor: pointer;
+            position: absolute; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white; border-radius: 50%; width: 45px; height: 45px; font-size: 18px;
+            display: flex; align-items: center; justify-content: center; user-select: none;
+            -webkit-user-select: none; touch-action: none; backdrop-filter: blur(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); cursor: pointer;
         }
-        .t-btn:active {
-            background: rgba(0, 255, 204, 0.5);
-            border-color: #00ffcc;
-            transform: scale(0.95);
-        }
+        .t-btn:active { background: rgba(0, 255, 204, 0.5); border-color: #00ffcc; transform: scale(0.95); }
 
-        .t-up { top: 0; left: 52.5px; }
-        .t-down { bottom: 0; left: 52.5px; }
-        .t-left { top: 52.5px; left: 0; }
-        .t-right { top: 52.5px; right: 0; }
+        .t-up { top: 0; left: 52.5px; } .t-down { bottom: 0; left: 52.5px; }
+        .t-left { top: 52.5px; left: 0; } .t-right { top: 52.5px; right: 0; }
 
-        .t-actions {
-            display: flex;
-            gap: 15px;
-            pointer-events: auto;
-        }
-        .t-action {
-            position: relative;
-            width: 60px;
-            height: 60px;
-            flex-direction: column;
-            font-size: 22px;
-        }
-        .t-action span {
-            font-size: 10px;
-            margin-top: 2px;
-            color: #ddd;
-            font-weight: 800;
-            font-family: 'Montserrat', sans-serif;
-        }
+        .t-actions { display: flex; gap: 15px; pointer-events: auto; }
+        .t-action { position: relative; width: 60px; height: 60px; flex-direction: column; font-size: 22px; }
+        .t-action span { font-size: 10px; margin-top: 2px; color: #ddd; font-weight: 800; font-family: 'Montserrat', sans-serif; }
 
         /* MEDIA QUERIES POUR ADAPTER L'AFFICHAGE SUR ECRANS MOBILES */
         @media (max-width: 850px) {
@@ -273,14 +278,20 @@
 
             /* Adaptation RPG */
             #pokemon-game { align-items: flex-start; padding-top: 15px; }
-            #rpg-container { width: 95vw; height: 71.25vw; border-width: 2px; }
-            #dialog-box { font-size: 9px; line-height: 1.4; padding: 10px; bottom: 5px; height: 50px; left: 5px; right: 5px; }
+            #rpg-container { width: 95vw; height: 71.25vw; border-width: 6px; border-radius: 8px 8px 30px 8px; }
+            #dialog-box { font-size: 10px; line-height: 1.6; padding: 10px; bottom: 5px; height: 60px; left: 5px; right: 5px; }
             .battle-top { padding: 10px; }
-            .battle-sprite { font-size: 40px !important; margin: 5px !important; text-shadow: 3px 3px 0 #ccc; }
-            .hp-box { width: 110px !important; margin-top: 10px !important; padding: 5px !important; border-width: 2px; }
+            
+            .battle-sprite { width: 60px !important; height: 60px !important; margin: 5px !important; }
+            #enemy-sprite::after { width: 80px; height: 25px; bottom: 0px; border-width: 2px;}
+            #player-sprite::after { width: 110px; height: 35px; bottom: 0px; border-width: 2px;}
+            
+            .hp-box { width: 140px !important; margin-top: 10px !important; padding: 6px !important; border-width: 2px !important; border-radius: 8px !important; }
             .hp-box > div:first-child { font-size: 9px !important; }
+            .hp-bar-bg { height: 8px !important; border-width: 1px !important; margin-top: 4px !important; }
+            
             #battle-log { font-size: 10px !important; padding: 5px !important; }
-            #battle-menu { padding: 5px !important; gap: 5px !important; height: auto; border-width: 2px; }
+            #battle-menu { padding: 8px !important; gap: 5px !important; height: auto; border-width: 4px; border-bottom-right-radius: 20px;}
             .battle-btn { font-size: 9px !important; padding: 10px 5px !important; border-width: 2px; }
 
             /* Adaptation DRONE */
@@ -297,19 +308,11 @@
             }
             #info-card.visible { visibility: visible; opacity: 1; transform: translate(-50%, -50%) scale(1) !important; }
             
-            /* CV Final Full Screen sur Mobile */
             #info-card.final {
-                width: 100vw !important;
-                height: 100vh !important;
-                max-height: 100vh !important;
-                top: 0 !important;
-                left: 0 !important;
-                transform: none !important;
-                border-radius: 0 !important;
-                border: none !important;
-                background: rgba(15, 15, 20, 0.98);
-                z-index: 999999;
-                box-sizing: border-box;
+                width: 100vw !important; height: 100vh !important; max-height: 100vh !important;
+                top: 0 !important; left: 0 !important; transform: none !important;
+                border-radius: 0 !important; border: none !important;
+                background: rgba(15, 15, 20, 0.98); z-index: 999999; box-sizing: border-box;
             }
 
             .cv-header h2 { font-size: 1.3rem; }
@@ -319,7 +322,7 @@
 </head>
 <body>
 
-<!-- === TOUCH CONTROLS (AJOUT) === -->
+<!-- === TOUCH CONTROLS === -->
 <div id="touch-controls">
     <div class="t-dpad">
         <button class="t-btn t-up" id="t-up">▲</button>
@@ -339,20 +342,25 @@
         <canvas id="rpg-canvas" width="640" height="480"></canvas>
         
         <div id="dialog-box">
-            <span id="dialog-text"></span><span class="blinking-cursor">_</span>
+            <span id="dialog-text"></span><span class="blinking-cursor"></span>
         </div>
 
         <div id="battle-screen">
             <div class="battle-top">
-                <div class="hp-box" style="margin-top: 50px;">
+                <div class="hp-box" style="margin-top: 20px;">
                     <div id="enemy-name">Danseur de Salsa</div>
                     <div class="hp-bar-bg"><div class="hp-bar-fill" id="enemy-hp-fill"></div></div>
                 </div>
-                <div class="battle-sprite" id="enemy-sprite">🕺</div>
+                <!-- Remplacement des Emojis par des SVGs Pixel Art -->
+                <div class="battle-sprite" id="enemy-sprite">
+                    <svg width="80" height="80" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="5" y="2" width="6" height="5" fill="#FFCC99"/><rect x="4" y="1" width="8" height="2" fill="#D8A838"/><rect x="10" y="2" width="2" height="3" fill="#D8A838"/><rect x="6" y="4" width="1" height="1" fill="#000"/><rect x="9" y="4" width="1" height="1" fill="#000"/><rect x="4" y="7" width="8" height="5" fill="#181818"/><rect x="4" y="12" width="3" height="4" fill="#A83030"/><rect x="9" y="12" width="3" height="4" fill="#A83030"/></svg>
+                </div>
             </div>
             
             <div class="battle-top" style="justify-content: flex-start; padding-top: 0;">
-                <div class="battle-sprite" id="player-sprite" style="margin-right: 50px; margin-top: 30px;">⚡</div>
+                <div class="battle-sprite" id="player-sprite" style="margin-right: 30px; margin-top: 50px;">
+                    <svg width="100" height="100" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="4" y="2" width="8" height="5" fill="#D83838"/><rect x="6" y="7" width="4" height="1" fill="#FFCC99"/><rect x="3" y="8" width="10" height="5" fill="#3498DB"/><rect x="5" y="9" width="6" height="4" fill="#506858"/><rect x="4" y="13" width="3" height="3" fill="#2C3E50"/><rect x="9" y="13" width="3" height="3" fill="#2C3E50"/></svg>
+                </div>
                 <div class="hp-box" style="margin-top: 80px;">
                     <div id="player-name">Électronique</div>
                     <div class="hp-bar-bg"><div class="hp-bar-fill" id="player-hp-fill"></div></div>
@@ -437,7 +445,7 @@
 
 <script>
 /* =========================================================================
-   PARTIE 0 : GESTION DES BOUTONS TACTILES (AJOUT)
+   PARTIE 0 : GESTION DES BOUTONS TACTILES 
    ========================================================================= */
 function bindTouch(id, key, code) {
     const btn = document.getElementById(id);
@@ -448,7 +456,6 @@ function bindTouch(id, key, code) {
         if (e && e.cancelable) e.preventDefault();
         window.dispatchEvent(new KeyboardEvent('keydown', { key: key, code: code }));
         
-        // Maintenir enfoncé = répétition de touche pour se déplacer dans le RPG
         if (isRPGActive &&['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
             if (interval) clearInterval(interval);
             interval = setInterval(() => {
@@ -465,7 +472,6 @@ function bindTouch(id, key, code) {
 
     btn.addEventListener('touchstart', start, { passive: false });
     btn.addEventListener('touchend', end, { passive: false });
-    // Souris (pour tester sur PC en simulant le mobile)
     btn.addEventListener('mousedown', start);
     btn.addEventListener('mouseup', end);
     btn.addEventListener('mouseleave', end);
@@ -488,13 +494,12 @@ const dialogText = document.getElementById('dialog-text');
 const battleScreen = document.getElementById('battle-screen');
 
 let isRPGActive = true;
-let rpgState = 'EXPLORE'; // EXPLORE, DIALOG, BATTLE
+let rpgState = 'EXPLORE'; 
 let currentMap = 'LAB';
 
 const TILE = 40;
 const MAP_W = 16, MAP_H = 12;
 
-// Maps: 0=Sol, 1=Mur, 2=Porte, 3=Herbe, 4=Table
 const maps = {
     LAB: [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,4,4,4,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     ],
@@ -502,86 +507,68 @@ const maps = {
     ]
 };
 
-let player = { x: 8, y: 7, dir: 'UP', emoji: '🧢' };
+let player = { id: 'player', x: 8, y: 7, dir: 'UP' };
 let entities =[];
-
-// Scénario Flags
 let flagPickBall = false;
 let flagBeatRival = false;
 
 function setupEntities() {
     if(currentMap === 'LAB') {
         entities =[
-            { id: 'chen', x: 8, y: 2, emoji: '👨‍🔬', interact: () => playDialog([
+            { id: 'chen', x: 8, y: 2, interact: () => playDialog([
                 "Prof. Chen : Bravo pour ton diplôme de Master Sciences De l'Ingénieur à l'UPMC !",
-                "Tu as 5 années d'études à apprende l'électronique, informatique et autres. Choisis ton avenir...",
+                "5 années d'études à apprendre l'électronique, informatique et autres. Choisis ton avenir...",
                 "Sur la table, tu as : Electronique, Informatique et Danseur de Salsa."
             ])},
-            { id: 'ball1', x: 7, y: 4, emoji: '🔴', interact: () => playDialog(["Pokeball Informatique. C'est vraiment intéressant."]) },
-            { id: 'ball2', x: 8, y: 4, emoji: '🔴', interact: pickElectronique },
-            { id: 'ball3', x: 9, y: 4, emoji: '🔴', interact: () => playDialog(["Pokeball Danseur de Salsa. Laissons ça au rival..."]) }
+            { id: 'ball1', x: 7, y: 4, interact: () => playDialog(["Pokeball Informatique. C'est vraiment intéressant."]) },
+            { id: 'ball2', x: 8, y: 4, interact: pickElectronique },
+            { id: 'ball3', x: 9, y: 4, interact: () => playDialog(["Pokeball Danseur de Salsa. Laissons ça au rival..."]) }
         ];
     } else if (currentMap === 'TOWN') {
-        player.y = 2; // spawn point in town
+        player.y = 2; 
         entities =[
-            { id: 'npc1', x: 4, y: 4, emoji: '🧑', interact: () => playDialog(["Mec 1 : Corentin a travaillé chez Valeo !", "Il a fait le design de cartes électroniques pour des chargeurs (OBC) de voitures électriques."]) },
-            { id: 'npc2', x: 10, y: 6, emoji: '👩', interact: () => playDialog(["Fille 1 : J'ai vu son profil. 5 ans d'expérience en hardware !", "Thales, Sagemcom, Faurecia, Lincoln Electric... Quel parcours !"]) },
-            { id: 'npc3', x: 6, y: 8, emoji: '👴', interact: () => playDialog(["Papy : Chez Thales AES, il a conçu une carte interconnexion pour l'aéronautique.", "Ah, l'électronique de puissance, c'est du solide !"]) }
+            { id: 'npc1', x: 4, y: 4, interact: () => playDialog(["Mec 1 : Corentin a travaillé chez Valeo !", "Il a fait le design de cartes électroniques pour des chargeurs (OBC) de voitures électriques."]) },
+            { id: 'npc2', x: 10, y: 6, interact: () => playDialog(["Fille 1 : J'ai vu son profil. 7 ans d'expérience en hardware !", "Thales, Sagemcom, Faurecia, Lincoln Electric... Quel parcours !"]) },
+            { id: 'npc3', x: 6, y: 8, interact: () => playDialog(["Papy : Chez Thales AES, il a conçu une carte interconnexion pour l'aéronautique.", "Ah, l'électronique de puissance, c'est du solide !"]) }
         ];
     }
 }
 
-// Variables pour le système de dialogue
-let dialogQueue =[];
-let currentDialog = "";
-let charIndex = 0;
-let dialogCallback = null;
-let isTyping = false;
+let dialogQueue =[]; let currentDialog = ""; let charIndex = 0;
+let dialogCallback = null; let isTyping = false;
 
 function playDialog(texts, callback = null) {
-    rpgState = 'DIALOG';
-    dialogQueue = texts;
-    dialogCallback = callback;
-    dialogBox.style.display = 'block';
-    nextDialog();
+    rpgState = 'DIALOG'; dialogQueue = texts; dialogCallback = callback;
+    dialogBox.style.display = 'block'; nextDialog();
 }
 
 function nextDialog() {
     if (dialogQueue.length === 0) {
-        dialogBox.style.display = 'none';
-        rpgState = 'EXPLORE';
+        dialogBox.style.display = 'none'; rpgState = 'EXPLORE';
         if(dialogCallback) dialogCallback();
         return;
     }
-    currentDialog = dialogQueue.shift();
-    dialogText.innerHTML = "";
-    charIndex = 0;
-    isTyping = true;
-    typeChar();
+    currentDialog = dialogQueue.shift(); dialogText.innerHTML = "";
+    charIndex = 0; isTyping = true; typeChar();
 }
 
 function typeChar() {
     if(!isTyping) return;
     if (charIndex < currentDialog.length) {
-        dialogText.innerHTML += currentDialog.charAt(charIndex);
-        charIndex++;
+        dialogText.innerHTML += currentDialog.charAt(charIndex); charIndex++;
         setTimeout(typeChar, 15);
-    } else {
-        isTyping = false;
-    }
+    } else { isTyping = false; }
 }
 
-// Séquence Choix & Rival
 function pickElectronique() {
     if(flagPickBall) return playDialog(["Tu as déjà choisi Electronique !"]);
     playDialog([
-        "Vous avez choisi la voie ÉLECTRONIQUE ! ( Master SDI à l' UPMC)",
+        "Vous avez choisi la voie ÉLECTRONIQUE !",
         "..."
     ], () => {
-        entities = entities.filter(e => e.id !== 'ball2' && e.id !== 'ball3'); // on garde info ou on l'enlève
+        entities = entities.filter(e => e.id !== 'ball2' && e.id !== 'ball3');
         flagPickBall = true;
-        // Fait spawn le rival
-        let rival = { id: 'rival', x: 8, y: 8, emoji: '🕺', interact: ()=>{} };
+        let rival = { id: 'rival', x: 8, y: 8, interact: ()=>{} };
         entities.push(rival);
         playDialog([
             "Rival : Hé ! Puisque tu as pris Electronique...",
@@ -592,42 +579,45 @@ function pickElectronique() {
 }
 
 // ---- COMBAT SYSTEM ----
-let battleType = 'RIVAL';
-let enemyHP = 100, playerHP = 100;
+let battleType = 'RIVAL'; let enemyHP = 100, playerHP = 100;
+
+const svgRival = `<svg width="80" height="80" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="5" y="2" width="6" height="5" fill="#FFCC99"/><rect x="4" y="1" width="8" height="2" fill="#D8A838"/><rect x="10" y="2" width="2" height="3" fill="#D8A838"/><rect x="6" y="4" width="1" height="1" fill="#000"/><rect x="9" y="4" width="1" height="1" fill="#000"/><rect x="4" y="7" width="8" height="5" fill="#181818"/><rect x="4" y="12" width="3" height="4" fill="#A83030"/><rect x="9" y="12" width="3" height="4" fill="#A83030"/></svg>`;
+const svgWild = `<svg width="80" height="80" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="5" y="2" width="6" height="5" fill="#FFCC99"/><rect x="4" y="1" width="8" height="2" fill="#506858"/><rect x="4" y="4" width="8" height="1" fill="#000"/><rect x="5" y="4" width="2" height="1" fill="#FFF"/><rect x="9" y="4" width="2" height="1" fill="#FFF"/><rect x="4" y="7" width="8" height="5" fill="#58A830"/><rect x="4" y="12" width="3" height="4" fill="#404040"/><rect x="9" y="12" width="3" height="4" fill="#404040"/></svg>`;
+const svgPlayer = `<svg width="100" height="100" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="4" y="2" width="8" height="5" fill="#D83838"/><rect x="6" y="7" width="4" height="1" fill="#FFCC99"/><rect x="3" y="8" width="10" height="5" fill="#3498DB"/><rect x="5" y="9" width="6" height="4" fill="#506858"/><rect x="4" y="13" width="3" height="3" fill="#2C3E50"/><rect x="9" y="13" width="3" height="3" fill="#2C3E50"/></svg>`;
 
 function startBattle(type) {
-    rpgState = 'BATTLE';
-    battleType = type;
-    enemyHP = 100; playerHP = 100;
-    updateHPBars();
+    rpgState = 'BATTLE'; battleType = type;
+    enemyHP = 100; playerHP = 100; updateHPBars();
     battleScreen.style.display = 'flex';
     
     if(type === 'RIVAL') {
-        document.getElementById('enemy-name').innerText = "Rival (Danseur de Salsa)";
-        document.getElementById('enemy-sprite').innerText = "🕺";
-        document.getElementById('player-name').innerText = "Électronique";
-        document.getElementById('player-sprite').innerText = "⚡";
+        document.getElementById('enemy-name').innerText = "Rival (Danseur de Salsa)"; 
+        document.getElementById('enemy-sprite').innerHTML = svgRival;
+        document.getElementById('player-name').innerText = "Électronique"; 
+        document.getElementById('player-sprite').innerHTML = svgPlayer;
         document.getElementById('battle-log').innerText = "Le Rival envoie Danseur de Salsa !";
-        
-        document.getElementById('atk1-btn').style.display = 'block';
-        document.getElementById('atk2-btn').style.display = 'block';
-        document.getElementById('catch-btn').style.display = 'none';
+        document.getElementById('atk1-btn').style.display = 'block'; document.getElementById('atk2-btn').style.display = 'block'; document.getElementById('catch-btn').style.display = 'none';
     } else if (type === 'WILD') {
-        document.getElementById('enemy-name').innerText = "DEV WEB Full Stack Sauvage";
-        document.getElementById('enemy-sprite').innerText = "💻";
-        document.getElementById('player-name').innerText = "Électronique";
-        document.getElementById('player-sprite').innerText = "⚡";
+        document.getElementById('enemy-name').innerText = "DEV WEB Full Stack Sauvage"; 
+        document.getElementById('enemy-sprite').innerHTML = svgWild;
+        document.getElementById('player-name').innerText = "Électronique"; 
+        document.getElementById('player-sprite').innerHTML = svgPlayer;
         document.getElementById('battle-log').innerText = "Un DEV WEB Full Stack sauvage apparaît !";
-
-        document.getElementById('atk1-btn').style.display = 'none';
-        document.getElementById('atk2-btn').style.display = 'none';
-        document.getElementById('catch-btn').style.display = 'block';
+        document.getElementById('atk1-btn').style.display = 'none'; document.getElementById('atk2-btn').style.display = 'none'; document.getElementById('catch-btn').style.display = 'block';
     }
 }
 
 function updateHPBars() {
-    document.getElementById('enemy-hp-fill').style.width = Math.max(0, enemyHP) + '%';
-    document.getElementById('player-hp-fill').style.width = Math.max(0, playerHP) + '%';
+    let eFill = document.getElementById('enemy-hp-fill');
+    let pFill = document.getElementById('player-hp-fill');
+    let ePct = Math.max(0, enemyHP);
+    let pPct = Math.max(0, playerHP);
+    
+    eFill.style.width = ePct + '%';
+    pFill.style.width = pPct + '%';
+    
+    eFill.style.background = ePct > 50 ? '#48D0B0' : (ePct > 20 ? '#F8D030' : '#F85838');
+    pFill.style.background = pPct > 50 ? '#48D0B0' : (pPct > 20 ? '#F8D030' : '#F85838');
 }
 
 function battleAnim(targetId) {
@@ -643,8 +633,7 @@ function useAttack(atk) {
     if(atk === 'eclair') log.innerText = "Électronique utilise Attaque Éclair !";
     else log.innerText = "Électronique utilise Court-circuit !";
     
-    battleAnim('enemy');
-    enemyHP -= 55; updateHPBars();
+    battleAnim('enemy'); enemyHP -= 55; updateHPBars();
 
     if(enemyHP <= 0) {
         log.innerText = "Danseur de Salsa est K.O. ! Vous avez gagné !";
@@ -652,12 +641,10 @@ function useAttack(atk) {
         return;
     }
 
-    // Tour du rival
     setTimeout(() => {
         let rAtk = Math.random() > 0.5 ? "Pas de chacha" : "Lancer de partenaire";
         log.innerText = `Rival utilise ${rAtk} !`;
-        battleAnim('player');
-        playerHP -= 20; updateHPBars();
+        battleAnim('player'); playerHP -= 20; updateHPBars();
     }, 1500);
 }
 
@@ -675,11 +662,10 @@ function endBattle(won) {
         flagBeatRival = true;
         playDialog([
             "Prof. Chen : Bravo ! L'électronique triomphe de la salsa !",
-            "Sors du bâtiment, tu peux discuter avec les bots pour en savoir plus, quand tu sera prêt, pars explorer le monde en traversant les hautes herbes! (et le reste du CV) !"
+            "Sors du bâtiment, tu peux discuter avec les bots pour en savoir plus. Quand tu seras prêt, pars explorer le monde en traversant les hautes herbes !"
         ]);
-        entities = entities.filter(e => e.id !== 'rival'); // Enlève le rival
+        entities = entities.filter(e => e.id !== 'rival');
     } else if (battleType === 'WILD') {
-        // Séquence finale avant Drone
         playDialog([
             "Ah mais celui-là est super ! Je vais utiliser DEV FULL STACK, c'est sûr !",
             "Voyons ses attaques... React, Node.js, Angular, Python, PHP, SQL...",
@@ -687,13 +673,11 @@ function endBattle(won) {
             "Mmmh... Les DRONES ça a l'air vachement stylé aussi !",
             "Passons aux choses sérieuses !"
         ], () => {
-            // TRANSITION VERS DRONE
             isRPGActive = false;
             document.getElementById('pokemon-game').style.display = 'none';
             document.getElementById('drone-game').style.display = 'block';
             droneActive = true;
-            buildWorld();
-            updateDrone();
+            buildWorld(); updateDrone();
         });
     }
 }
@@ -717,7 +701,6 @@ window.addEventListener('keydown', (e) => {
         else if(e.key === 'ArrowLeft' || e.key === 'q') { nx--; player.dir = 'LEFT'; }
         else if(e.key === 'ArrowRight' || e.key === 'd') { nx++; player.dir = 'RIGHT'; }
         else if(e.code === 'Enter' || e.code === 'Space') {
-            // Interaction
             let tx = player.x, ty = player.y;
             if(player.dir==='UP') ty--; else if(player.dir==='DOWN') ty++;
             else if(player.dir==='LEFT') tx--; else if(player.dir==='RIGHT') tx++;
@@ -731,21 +714,15 @@ window.addEventListener('keydown', (e) => {
             let mapData = maps[currentMap];
             if(ny>=0 && ny<MAP_H && nx>=0 && nx<MAP_W) {
                 let tile = mapData[ny][nx];
-                if(tile === 0 || tile === 2 || tile === 3) {
-                    // Check entity collision
+                if(tile === 0 || tile === 2 || tile === 3 || tile === 4) { 
+                    if(tile === 4) return; 
                     if(!entities.some(e => e.x === nx && e.y === ny)) {
                         player.x = nx; player.y = ny;
-                        
-                        // Door transition
                         if(tile === 2 && currentMap === 'LAB' && flagBeatRival) {
-                            currentMap = 'TOWN';
-                            setupEntities();
+                            currentMap = 'TOWN'; setupEntities();
                         } else if(tile === 2 && currentMap === 'LAB' && !flagBeatRival) {
-                            playDialog(["Prof Chen : Minute Papillon ! Prends d'abord ton avenir en main !"]);
-                            player.y--; // recule
+                            playDialog(["Prof Chen : Minute Papillon ! Prends d'abord ton avenir en main !"]); player.y--; 
                         }
-
-                        // Wild Grass encounter
                         if(tile === 3 && currentMap === 'TOWN') {
                             if(Math.random() < 0.1) startBattle('WILD');
                         }
@@ -762,34 +739,167 @@ function drawRPG() {
     
     let mapData = maps[currentMap];
     
-    // Draw Map
     for(let y=0; y<MAP_H; y++) {
         for(let x=0; x<MAP_W; x++) {
             let t = mapData[y][x];
-            ctx.fillStyle = t===1 ? '#555' : t===0 ? '#E8DDB5' : t===2 ? '#8B4513' : t===3 ? '#78C850' : t===4 ? '#CD853F' : 'black';
-            ctx.fillRect(x*TILE, y*TILE, TILE, TILE);
-            
-            // Grid lines for grass or floor
-            if(t===0 || t===3) {
-                ctx.strokeStyle = 'rgba(0,0,0,0.05)';
-                ctx.strokeRect(x*TILE, y*TILE, TILE, TILE);
-            }
-            if(t===3) {
-                ctx.fillStyle = '#65A840'; ctx.fillRect(x*TILE+5, y*TILE+10, 5, 10);
-                ctx.fillRect(x*TILE+25, y*TILE+20, 5, 10);
+            let px = x * TILE;
+            let py = y * TILE;
+
+            if (currentMap === 'LAB') {
+                if (t === 1) { 
+                    ctx.fillStyle = '#6888A8'; ctx.fillRect(px, py, TILE, TILE);
+                    ctx.fillStyle = '#90B0C8'; ctx.fillRect(px, py, TILE, 4); 
+                    ctx.fillStyle = '#405878'; ctx.fillRect(px, py+TILE-4, TILE, 4); 
+                } else if (t === 0 || t === 2) { 
+                    ctx.fillStyle = '#E8F0F8'; ctx.fillRect(px, py, TILE, TILE);
+                    ctx.fillStyle = '#D0D8E0'; 
+                    ctx.fillRect(px+TILE-2, py, 2, TILE); ctx.fillRect(px, py+TILE-2, TILE, 2);
+                    if (t === 2) { 
+                        ctx.fillStyle = '#D83838'; ctx.fillRect(px+4, py+4, TILE-8, TILE-4);
+                        ctx.fillStyle = '#F8A838'; ctx.fillRect(px+8, py+8, TILE-16, TILE-12);
+                    }
+                } else if (t === 4) { 
+                    ctx.fillStyle = '#E8F0F8'; ctx.fillRect(px, py, TILE, TILE); 
+                    ctx.fillStyle = '#B88858'; ctx.fillRect(px+2, py+4, TILE-4, TILE-14); 
+                    ctx.fillStyle = '#906030'; ctx.fillRect(px+2, py+TILE-10, TILE-4, 10); 
+                    if((x+y)%2 === 0) { 
+                        ctx.fillStyle = '#F8F8F8'; ctx.fillRect(px+8, py+8, 12, 16); 
+                    } else {
+                        ctx.fillStyle = '#404040'; ctx.fillRect(px+8, py+6, 16, 12); 
+                        ctx.fillStyle = '#80C0F0'; ctx.fillRect(px+10, py+8, 12, 8); 
+                    }
+                }
+            } else { 
+                if (t === 3) { 
+                    ctx.fillStyle = '#78C850'; ctx.fillRect(px, py, TILE, TILE);
+                    ctx.fillStyle = '#58A830'; ctx.fillRect(px+8, py+8, 8, 8); ctx.fillRect(px+24, py+24, 8, 8);
+                    ctx.fillStyle = '#90E068'; ctx.fillRect(px+8, py+8, 4, 4); ctx.fillRect(px+24, py+24, 4, 4);
+                } else if (t === 0) { 
+                    ctx.fillStyle = '#E0C8A0'; ctx.fillRect(px, py, TILE, TILE);
+                    ctx.fillStyle = '#C8A878'; 
+                    ctx.fillRect(px+4, py+4, 4, 4); ctx.fillRect(px+28, py+16, 4, 4); ctx.fillRect(px+12, py+32, 4, 4);
+                } else if (t === 1) { 
+                    ctx.fillStyle = '#387028'; ctx.fillRect(px, py, TILE, TILE); 
+                    ctx.fillStyle = '#489030'; 
+                    ctx.beginPath(); ctx.arc(px+TILE/2, py+TILE/2 + 4, TILE/2 - 2, 0, Math.PI*2); ctx.fill();
+                    ctx.fillStyle = '#60B048'; 
+                    ctx.beginPath(); ctx.arc(px+TILE/2 - 4, py+TILE/2 - 2, TILE/3, 0, Math.PI*2); ctx.fill();
+                } else if (t === 2) { 
+                    ctx.fillStyle = '#E0C8A0'; ctx.fillRect(px, py, TILE, TILE); 
+                    ctx.fillStyle = '#D83838'; ctx.fillRect(px+4, py+4, TILE-8, TILE-4);
+                    ctx.fillStyle = '#F8A838'; ctx.fillRect(px+8, py+8, TILE-16, TILE-12);
+                }
             }
         }
     }
 
-    // Draw Entities
-    ctx.font = '24px Arial';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    entities.forEach(e => {
-        ctx.fillText(e.emoji, e.x*TILE + TILE/2, e.y*TILE + TILE/2);
-    });
+    let time = Date.now() / 200;
+    
+    let drawChar = (e, isPlayer) => {
+        let px = e.x * TILE + TILE/2;
+        let py = e.y * TILE + TILE/2;
+        let bob = Math.sin(time + e.x)*2;
 
-    // Draw Player
-    ctx.fillText(player.emoji, player.x*TILE + TILE/2, player.y*TILE + TILE/2 - 5);
+        // Ombre sous le personnage (fixe au sol)
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.beginPath();
+        ctx.ellipse(px, py + 14, 10, 4, 0, 0, Math.PI*2);
+        ctx.fill();
+
+        let cy = py - 4 + bob; 
+
+        // Si c'est une Pokéball
+        if (e.id && e.id.startsWith('ball')) {
+            ctx.strokeStyle = '#202020'; ctx.lineWidth = 2;
+            
+            // Moitié haute rouge foncé
+            ctx.fillStyle = '#8B0000'; 
+            ctx.beginPath(); ctx.arc(px, cy+4, 7, Math.PI, 0); ctx.fill(); ctx.stroke();
+            
+            // Moitié basse blanche
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath(); ctx.arc(px, cy+4, 7, 0, Math.PI); ctx.fill(); ctx.stroke();
+            
+            // Ligne et bouton noir et blanc
+            ctx.fillStyle = '#202020';
+            ctx.fillRect(px - 7, cy+3, 14, 2);
+            ctx.beginPath(); ctx.arc(px, cy+4, 3, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#FFF';
+            ctx.beginPath(); ctx.arc(px, cy+4, 1.5, 0, Math.PI*2); ctx.fill();
+            return;
+        }
+
+        // --- Personnages complets (Tête et Corps opaques) ---
+        let skin = '#FFCC99';
+        let top = '#3498DB';
+        let bot = '#2C3E50';
+        let hair = '#4A2311';
+        let hasHat = false;
+
+        if (isPlayer) {
+            top = '#D83838'; bot = '#306898'; hasHat = true; 
+        } else if (e.id === 'chen') {
+            top = '#FFFFFF'; bot = '#606060'; hair = '#E0E0E0';
+        } else if (e.id === 'rival') {
+            top = '#181818'; bot = '#A83030'; hair = '#D8A838';
+        } else if (e.id === 'npc1') {
+            top = '#58A830'; bot = '#506858'; hair = '#282828';
+        } else if (e.id === 'npc2') {
+            top = '#F8A838'; bot = '#387028'; hair = '#8B4513';
+        } else if (e.id === 'npc3') {
+            top = '#90B0C8'; bot = '#404040'; hair = '#F0F0F0';
+        }
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#202020'; // Contour pour bloquer toute transparence
+
+        // Jambes
+        ctx.fillStyle = bot;
+        ctx.fillRect(px - 5, cy + 6, 4, 6); ctx.strokeRect(px - 5, cy + 6, 4, 6);
+        ctx.fillRect(px + 1, cy + 6, 4, 6); ctx.strokeRect(px + 1, cy + 6, 4, 6);
+
+        // Corps
+        ctx.fillStyle = top;
+        ctx.fillRect(px - 7, cy - 4, 14, 10); ctx.strokeRect(px - 7, cy - 4, 14, 10);
+
+        // Tête
+        ctx.fillStyle = skin;
+        ctx.fillRect(px - 6, cy - 14, 12, 10); ctx.strokeRect(px - 6, cy - 14, 12, 10);
+
+        // Cheveux / Chapeau
+        if (hasHat) {
+            ctx.fillStyle = '#D83838';
+            ctx.fillRect(px - 6, cy - 16, 12, 4);
+            ctx.fillStyle = '#F8F8F8';
+            ctx.fillRect(px - 3, cy - 16, 6, 4);
+            ctx.fillStyle = '#D83838';
+            if(player.dir === 'LEFT') ctx.fillRect(px - 10, cy - 12, 6, 2);
+            else if(player.dir === 'RIGHT') ctx.fillRect(px + 4, cy - 12, 6, 2);
+            else if(player.dir === 'DOWN') ctx.fillRect(px - 8, cy - 12, 16, 2);
+        } else {
+            ctx.fillStyle = hair;
+            ctx.fillRect(px - 7, cy - 15, 14, 4);
+            ctx.fillRect(px - 7, cy - 12, 3, 4);
+            ctx.fillRect(px + 4, cy - 12, 3, 4);
+        }
+
+        // Yeux
+        ctx.fillStyle = '#000';
+        let isBack = isPlayer && player.dir === 'UP';
+        if (!isBack) {
+            if (isPlayer && player.dir === 'LEFT') {
+                ctx.fillRect(px - 4, cy - 10, 2, 2);
+            } else if (isPlayer && player.dir === 'RIGHT') {
+                ctx.fillRect(px + 2, cy - 10, 2, 2);
+            } else {
+                ctx.fillRect(px - 3, cy - 10, 2, 2);
+                ctx.fillRect(px + 1, cy - 10, 2, 2);
+            }
+        }
+    };
+
+    entities.forEach(e => drawChar(e, false));
+    drawChar(player, true);
 
     requestAnimationFrame(drawRPG);
 }
@@ -799,7 +909,7 @@ requestAnimationFrame(drawRPG);
 
 
 /* =========================================================================
-   PARTIE 2 : MOTEUR DRONE FPV (JEU ORIGINAL INJECTÉ)
+   PARTIE 2 : MOTEUR DRONE FPV (JEU ORIGINAL INTACT)
    ========================================================================= */
 
 let droneActive = false;
@@ -881,7 +991,6 @@ function buildWorld() {
         container.innerHTML = `<div class="zone-label">${s.label}</div><div class="landing-pad"></div>`;
         world.appendChild(container);
 
-        // Positionnement dynamique de la minimap avec des % au lieu de pixels fixes
         const miniZone = document.createElement('div'); miniZone.className = 'mini-zone';
         miniZone.style.left = (s.x / WORLD_SIZE * 100) + '%';
         miniZone.style.top = (s.y / WORLD_SIZE * 100) + '%';
@@ -891,7 +1000,6 @@ function buildWorld() {
     });
 }
 
-// Inputs spécifiques au Drone (bloqués si on est sur RPG)
 window.addEventListener('keydown', e => {
     if(!droneActive) return;
     keys[e.key.toLowerCase()] = true;
@@ -954,9 +1062,8 @@ function displayFinalCV() {
     
     infoCard.innerHTML = html;
     infoCard.style.borderLeftColor = "var(--primary)";
-    infoCard.classList.add('visible', 'final'); // On ajoute "final" pour le plein écran CSS
+    infoCard.classList.add('visible', 'final');
 
-    // Cache les boutons tactiles pour faciliter la lecture sur mobile
     if (window.matchMedia("(max-width: 850px)").matches) {
         const tc = document.getElementById('touch-controls');
         if(tc) tc.style.display = 'none';
@@ -1024,18 +1131,14 @@ function updateDrone() {
         if(dist < 150) {
             hoveringSpot = s;
             if(!s.visited) {
-                s.visited = true; 
-                visitedCount++;
+                s.visited = true; visitedCount++;
                 document.getElementById(`spot-${s.id}`).classList.add('visited');
                 
                 if(visitedCount === 4 && !bossSpawned) {
-                    // C'est ici que l'on désactive le boss sur mobile (mais pas sur PC)
                     if (window.matchMedia("(max-width: 850px)").matches) {
-                        bossSpawned = true;
-                        bossDead = true;
+                        bossSpawned = true; bossDead = true;
                         objBanner.innerHTML = "🏆 FÉLICITATIONS ! CV COMPLET DÉVERROUILLÉ";
-                        objBanner.style.borderColor = "var(--primary)"; 
-                        objBanner.style.color = "var(--primary)";
+                        objBanner.style.borderColor = "var(--primary)"; objBanner.style.color = "var(--primary)";
                         displayFinalCV();
                     } else {
                         spawnDragon();
@@ -1056,8 +1159,7 @@ function updateDrone() {
                 </div>
                 <div style="font-size:1.05rem; line-height:1.6;">${hoveringSpot.content}</div>
             `;
-            infoCard.style.borderLeftColor = hoveringSpot.color;
-            infoCard.classList.add('visible');
+            infoCard.style.borderLeftColor = hoveringSpot.color; infoCard.classList.add('visible');
         } else {
             infoCard.classList.remove('visible');
         }
@@ -1066,17 +1168,14 @@ function updateDrone() {
     for(let i = lasers.length - 1; i >= 0; i--) {
         let l = lasers[i]; l.x += l.vx; l.y += l.vy; l.life--; l.el.style.left = l.x + 'px'; l.el.style.top = l.y + 'px';
         if(!bossDead && bossSpawned && Math.hypot(l.x - boss.x, l.y - boss.y) < 120) {
-            boss.hp -= 10;
-            bossHpFill.style.width = Math.max(0, (boss.hp/boss.maxHp)*100) + '%';
+            boss.hp -= 10; bossHpFill.style.width = Math.max(0, (boss.hp/boss.maxHp)*100) + '%';
             boss.sprite.style.filter = 'brightness(2) sepia(1) hue-rotate(-50deg) saturate(5)';
             setTimeout(() => boss.sprite.style.filter = 'none', 100);
             
             if(boss.hp <= 0 && !bossDead) {
-                bossDead = true; 
-                miniBoss.style.display = 'none';
+                bossDead = true; miniBoss.style.display = 'none';
                 objBanner.innerHTML = "🏆 FÉLICITATIONS ! CV COMPLET DÉVERROUILLÉ";
-                objBanner.style.borderColor = "var(--primary)"; 
-                objBanner.style.color = "var(--primary)";
+                objBanner.style.borderColor = "var(--primary)"; objBanner.style.color = "var(--primary)";
                 displayFinalCV();
             }
             l.el.remove(); lasers.splice(i, 1); continue;
@@ -1085,8 +1184,7 @@ function updateDrone() {
     }
 
     if(bossSpawned && !bossDead) {
-        boss.timer++;
-        let dx = pos.x - boss.x; let dy = pos.y - boss.y;
+        boss.timer++; let dx = pos.x - boss.x; let dy = pos.y - boss.y;
         let dist = Math.hypot(dx, dy); let ang = Math.atan2(dy, dx);
 
         if(boss.state === 'CHASE') {
@@ -1145,7 +1243,6 @@ function updateDrone() {
     let camY = Math.max(0, Math.min(pos.y - window.innerHeight / 2, WORLD_SIZE - window.innerHeight));
     world.style.transform = `translate3d(${-camX}px, ${-camY}px, 0)`;
     
-    // Positionnement mini-map dynamique (en %)
     miniPlayer.style.left = (pos.x / WORLD_SIZE * 100) + '%'; 
     miniPlayer.style.top = (pos.y / WORLD_SIZE * 100) + '%';
     miniBoss.style.left = (boss.x / WORLD_SIZE * 100) + '%'; 
