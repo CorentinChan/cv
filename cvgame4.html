@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Corentin Chan - CV Pokémon & Drone</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Montserrat:wght@400;600;800;900&display=swap');
+
+        /* --- STYLES GLOBAUX --- */
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background-color: #000;
+            user-select: none;
+            touch-action: none; /* Empêche le scroll natif sur mobile */
+        }
+
+        /* --- JEU POKEMON (RPG) --- */
+        #pokemon-game {
+            position: relative; width: 100vw; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            background: #222; font-family: 'Press Start 2P', monospace;
+        }
+
+        #rpg-container {
+            position: relative; width: 640px; height: 480px;
+            background: #78C850; border: 4px solid #fff; border-radius: 8px;
+            overflow: hidden; box-shadow: 0 0 20px rgba(255,255,255,0.2);
+            image-rendering: pixelated;
+        }
+
+        canvas { display: block; width: 100%; height: 100%; }
+
+        #dialog-box {
+            position: absolute; bottom: 10px; left: 10px; right: 10px; height: 100px;
+            background: #fff; border: 4px solid #333; border-radius: 8px;
+            padding: 15px; font-size: 14px; line-height: 1.5; color: #000;
+            display: none; box-shadow: 0 4px 0 #ccc inset; z-index: 10;
+        }
+        #dialog-text { display: inline-block; }
+        .blinking-cursor { animation: blink 1s infinite; }
+        @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+
+        #battle-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #f8f8f8; display: none; z-index: 20;
+            flex-direction: column; justify-content: space-between;
+        }
+        
+        .battle-top { display: flex; justify-content: space-between; padding: 20px; }
+        .battle-sprite { font-size: 80px; text-shadow: 5px 5px 0 #ccc; }
+        
+        .hp-box {
+            background: #fff; border: 3px solid #333; padding: 10px;
+            width: 200px; border-radius: 8px; font-size: 12px;
+        }
+        .hp-bar-bg { background: #333; height: 10px; width: 100%; margin-top: 5px; border-radius: 5px; overflow: hidden; }
+        .hp-bar-fill { background: #48D0B0; height: 100%; width: 100%; transition: width 0.3s; }
+        
+        #battle-log {
+            flex-grow: 1; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; padding: 20px; text-align: center; color: #333;
+        }
+
+        #battle-menu {
+            height: 120px; background: #fff; border-top: 4px solid #333;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px;
+        }
+        .battle-btn {
+            font-family: 'Press Start 2P', monospace; font-size: 12px;
+            background: #eee; border: 3px solid #333; cursor: pointer;
+            border-radius: 5px; text-transform: uppercase;
+        }
+        .battle-btn:hover { background: #ddd; }
+        .battle-btn:active { background: #ccc; }
+
+        .battle-flash {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: white; opacity: 0; pointer-events: none; z-index: 30;
+        }
+
+        /* --- JEU DRONE FPV --- */
+        :root {
+            --world-size: 4000px;
+            --ui-bg: rgba(15, 15, 20, 0.9);
+            --text: #f0f0f0;
+            --primary: #00ffcc;
+            --danger: #ff3300;
+        }
+
+        #drone-game { display: none; width: 100vw; height: 100vh; font-family: 'Montserrat', sans-serif; color: var(--text); cursor: crosshair; }
+        #viewport { position: relative; width: 100vw; height: 100vh; overflow: hidden; perspective: 1200px; }
+        #world { position: absolute; top: 0; left: 0; width: var(--world-size); height: var(--world-size); transform-origin: 0 0; will-change: transform; }
+
+        .biome { position: absolute; width: 50%; height: 50%; z-index: 0; }
+        #biome-forest { top: 0; left: 0; background: radial-gradient(circle at center, #3a5f2d, #1e3615); }
+        #biome-mountain { top: 0; left: 50%; background: radial-gradient(circle at center, #8a939e, #434950); }
+        #biome-beach { top: 50%; left: 0; background: linear-gradient(135deg, #e3c99e 40%, #4ea5d9 45%, #1d6e9e 100%); }
+        #biome-bando { top: 50%; left: 50%; background: repeating-linear-gradient(45deg, #444, #444 20px, #3a3a3a 20px, #3a3a3a 40px); }
+
+        .obstacle { position: absolute; z-index: 5; transform: translate(-50%, -50%); box-shadow: 10px 10px 20px rgba(0,0,0,0.6); }
+        .obs-tree { border-radius: 50%; background: #224016; border: 4px solid #1a3010; }
+        .obs-tree::after { content: ''; position: absolute; top: 10%; left: 10%; width: 50%; height: 50%; background: #3a6b24; border-radius: 50%; }
+        .obs-rock { border-radius: 40% 60% 70% 30%; background: linear-gradient(135deg, #999, #555); }
+        .obs-palm { border-radius: 50%; background: #d99a36; border: 3px solid #8c5d18; }
+        .obs-palm::before { content:'🌿'; font-size: 2rem; position: absolute; top:-15px; left:-10px; }
+        .obs-wall { transform: none; background: repeating-linear-gradient(90deg, #9c3c3c, #9c3c3c 15px, #bbb 15px, #bbb 18px); border: 2px solid #5a1e1e; border-radius: 2px; }
+
+        .cv-zone { position: absolute; width: 300px; height: 300px; transform: translate(-50%, -50%); z-index: 2; display: flex; align-items: center; justify-content: center; }
+        .landing-pad { position: absolute; width: 150px; height: 150px; border-radius: 50%; border: 5px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.1); backdrop-filter: blur(2px); box-shadow: 0 0 30px rgba(255,255,255,0.5); animation: pulse 2s infinite; display: flex; align-items: center; justify-content: center; transition: all 0.5s; }
+        .landing-pad::after { content: 'H'; font-size: 4.5rem; font-weight: 800; color: rgba(255,255,255,0.8); line-height: 1; transition: all 0.5s; }
+        .zone-label { position: absolute; top: -50px; font-size: 1.8rem; font-weight: 800; text-shadow: 2px 2px 5px #000; letter-spacing: 2px; white-space: nowrap; color: #fff; }
+        .cv-zone.visited .landing-pad { background: rgba(0,255,204,0.3); border-color: var(--primary); box-shadow: 0 0 50px var(--primary); animation: none;}
+        .cv-zone.visited .landing-pad::after { color: var(--primary); }
+        @keyframes pulse { 0% { transform: scale(0.95); } 50% { transform: scale(1.05); } 100% { transform: scale(0.95); } }
+
+        #drone-wrapper { position: absolute; width: 160px; height: 160px; transform: translate(-50%, -50%); z-index: 100; will-change: left, top, transform; }
+        .drone-shadow { position: absolute; top: 50%; left: 50%; width: 80px; height: 80px; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.6); border-radius: 50%; filter: blur(12px); }
+        #drone { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; }
+        .chassis { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; background: repeating-linear-gradient(45deg, #222, #222 5px, #111 5px, #111 10px); border-radius: 12px; border: 2px solid #000; z-index: 3; box-shadow: inset 0 0 10px #000; }
+        .chassis::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 12px var(--primary); }
+        .arm { position: absolute; width: 60px; height: 8px; background: #222; top: calc(50% - 4px); left: 50%; z-index: 1; border-radius: 4px; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); transform-origin: left center; }
+        .arm-1 { transform: rotate(45deg); } .arm-2 { transform: rotate(135deg); } .arm-3 { transform: rotate(225deg); } .arm-4 { transform: rotate(315deg); }
+        .motor { position: absolute; right: -10px; top: -6px; width: 20px; height: 20px; background: radial-gradient(circle, #aaa, #333); border-radius: 50%; border: 1px solid #000; }
+        .rotor { position: absolute; right: -25px; top: -21px; width: 50px; height: 50px; border-radius: 50%; background: rgba(200, 200, 200, 0.1); border: 2px solid rgba(255, 255, 255, 0.3); animation: spinFast 0.02s linear infinite; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+        .rotor::after { content: ''; position: absolute; top: 23px; left: 2px; width: 46px; height: 4px; background: rgba(0, 0, 0, 0.4); filter: blur(2px); }
+        @keyframes spinFast { 100% { transform: rotate(360deg); } }
+
+        .laser { position: absolute; width: 40px; height: 4px; background: #fff; box-shadow: 0 0 15px var(--primary), 0 0 5px var(--primary); border-radius: 4px; z-index: 90; }
+        .meteor-warning { position: absolute; width: 120px; height: 120px; border: 4px dashed var(--danger); border-radius: 50%; transform: translate(-50%, -50%); z-index: 4; animation: blinkWarning 0.2s infinite; background: rgba(255, 51, 0, 0.2); }
+        @keyframes blinkWarning { 0% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 1; transform: translate(-50%, -50%) scale(0.9); } }
+        .meteor { position: absolute; width: 80px; height: 80px; background: radial-gradient(circle at 30% 30%, #ffcc00, #ff0000); border-radius: 50%; transform: translate(-50%, -50%); z-index: 200; box-shadow: 0 0 30px #ff0000, inset -10px -10px 20px #660000; }
+        .meteor::after { content: ''; position: absolute; top:-20px; left:-20px; width:120px; height:120px; background: rgba(255,0,0,0.5); filter: blur(20px); z-index:-1; border-radius: 50%; }
+
+        #boss-dragon { position: absolute; width: 250px; height: 250px; z-index: 150; transform: translate(-50%, -50%); will-change: left, top, transform; pointer-events: none; display: none; }
+        .dragon-shadow { position: absolute; top: 60%; left: 50%; width: 120px; height: 120px; background: rgba(0,0,0,0.6); border-radius: 50%; transform: translate(-50%, -50%); filter: blur(20px); }
+        .dragon-body-wrapper { position: absolute; width: 100%; height: 100%; transition: transform 0.3s; }
+        .dragon-body { position: absolute; top: 60px; left: 95px; width: 60px; height: 120px; background: linear-gradient(135deg, #008833, #004411); border-radius: 30px; box-shadow: inset -5px -5px 15px #000; }
+        .dragon-head { position: absolute; top: -40px; left: 5px; width: 50px; height: 60px; background: #00aa44; border-radius: 10px 10px 30px 30px; box-shadow: inset -5px -5px 10px #003300; }
+        .dragon-eye { position: absolute; top: 15px; left: 35px; width: 10px; height: 10px; background: #ff0000; border-radius: 50%; box-shadow: 0 0 10px #ff0000; animation: blink 3s infinite; }
+        .dragon-snout { position: absolute; top: 10px; left: 45px; width: 30px; height: 25px; background: #008833; border-radius: 10px; }
+        .dragon-wing { position: absolute; top: 30px; width: 150px; height: 100px; background: radial-gradient(ellipse at top, #aa2200, #440000); clip-path: polygon(0 0, 100% 0, 80% 100%, 50% 80%, 20% 100%); z-index: -1; }
+        .dragon-wing.left { left: -100px; transform-origin: right top; animation: flapL 0.4s infinite alternate ease-in-out; }
+        .dragon-wing.right { right: 10px; transform-origin: left top; animation: flapR 0.4s infinite alternate ease-in-out; }
+        .dragon-tail { position: absolute; bottom: -80px; left: 15px; width: 30px; height: 100px; background: linear-gradient(to bottom, #004411, #002200); border-radius: 0 0 50% 50%; transform-origin: top center; animation: tailWag 1.5s infinite alternate ease-in-out; }
+
+        @keyframes flapL { from { transform: rotate(20deg); } to { transform: rotate(-40deg); } }
+        @keyframes flapR { from { transform: rotate(-20deg); } to { transform: rotate(40deg); } }
+        @keyframes tailWag { from { transform: rotate(-15deg); } to { transform: rotate(15deg); } }
+        @keyframes blink { 0%, 95%, 100% { transform: scaleY(1); } 97% { transform: scaleY(0.1); } }
+
+        #dragon-target-line { position: absolute; height: 6px; background: rgba(255, 51, 0, 0.8); transform-origin: left center; z-index: 10; display: none; box-shadow: 0 0 15px var(--danger); }
+
+        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; z-index: 1000; }
+        #top-ui { width: 100%; display: flex; flex-direction: column; align-items: center; }
+        #objective-banner { background: rgba(0,0,0,0.8); border: 2px solid var(--primary); padding: 10px 30px; border-radius: 30px; font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 20px rgba(0,255,204,0.3); transition: all 0.3s; }
+        
+        #boss-ui-container { width: 60%; margin-top: 15px; text-align: center; display: none; }
+        #boss-name { font-size: 1.5rem; font-weight: 900; color: #ff3300; text-transform: uppercase; letter-spacing: 5px; text-shadow: 2px 2px 5px #000; margin-bottom: 5px; }
+        #boss-hp-bg { width: 100%; height: 25px; background: #222; border: 3px solid #555; border-radius: 15px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
+        #boss-hp-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #ff0000, #ff9900); transition: width 0.1s; }
+
+        #info-card {
+            position: absolute; top: 50%; right: 30px; transform: translateY(-50%) translateX(100px);
+            width: 450px; max-height: 85vh; overflow-y: auto; border-left: 5px solid var(--primary);
+            background: var(--ui-bg); padding: 20px; border-radius: 12px; backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8); display: flex; flex-direction: column; pointer-events: auto;
+            opacity: 0; visibility: hidden; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #info-card.visible { opacity: 1; visibility: visible; transform: translateY(-50%) translateX(0); }
+        
+        .cv-header { text-align: center; border-bottom: 2px solid #444; padding-bottom: 10px; margin-bottom: 15px; }
+        .cv-header h2 { margin: 0; font-size: 1.8rem; text-transform: uppercase; }
+        .cv-header p { margin: 5px 0 0 0; font-size: 0.9rem; color: #aaa; }
+        .cv-section { background: rgba(0,0,0,0.5); border: 1px solid #333; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 3px solid #555; }
+        .tag { display: inline-block; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; margin: 3px; border: 1px solid rgba(255,255,255,0.2); }
+
+        .hint-bar { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; }
+        .controls-hint { background: var(--ui-bg); padding: 10px 20px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.2); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .key-btn { background: #fff; color: #000; padding: 2px 8px; border-radius: 4px; font-weight: bold; margin: 0 5px; }
+
+        .minimap { position: absolute; bottom: 30px; left: 30px; width: 180px; height: 180px; border: 2px solid #555; background: #111; border-radius: 12px; overflow: hidden; }
+        .mm-f { position:absolute; top:0; left:0; width:50%; height:50%; background:#2c4c23; }
+        .mm-m { position:absolute; top:0; left:50%; width:50%; height:50%; background:#60676e; }
+        .mm-b { position:absolute; top:50%; left:0; width:50%; height:50%; background:#3787b5; }
+        .mm-u { position:absolute; top:50%; left:50%; width:50%; height:50%; background:#333; }
+        .mini-player { width: 8px; height: 8px; background: #00ffcc; border-radius: 50%; position: absolute; transform: translate(-50%, -50%); z-index: 10; }
+        .mini-zone { position: absolute; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 10px #fff; transform: translate(-50%, -50%); }
+        .mini-boss { width: 14px; height: 14px; background: #ff3300; border-radius: 50%; position: absolute; transform: translate(-50%, -50%); z-index: 11; box-shadow: 0 0 10px #ff3300; display: none;}
+
+        #damage-flash { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(255, 0, 0, 0.4); z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.1s; }
+
+        /* =========================================================================
+           AJOUTS RESPONSIVE MOBILE & BOUTONS TACTILES
+           ========================================================================= */
+        #touch-controls {
+            display: none; /* Masqué par défaut sur desktop */
+            position: fixed;
+            bottom: 25px;
+            left: 0;
+            width: 100vw;
+            padding: 0 20px;
+            box-sizing: border-box;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 99999;
+            pointer-events: none;
+        }
+
+        .t-dpad {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            pointer-events: auto;
+        }
+
+        .t-btn {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            cursor: pointer;
+        }
+        .t-btn:active {
+            background: rgba(0, 255, 204, 0.5);
+            border-color: #00ffcc;
+            transform: scale(0.95);
+        }
+
+        .t-up { top: 0; left: 52.5px; }
+        .t-down { bottom: 0; left: 52.5px; }
+        .t-left { top: 52.5px; left: 0; }
+        .t-right { top: 52.5px; right: 0; }
+
+        .t-actions {
+            display: flex;
+            gap: 15px;
+            pointer-events: auto;
+        }
+        .t-action {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            flex-direction: column;
+            font-size: 22px;
+        }
+        .t-action span {
+            font-size: 10px;
+            margin-top: 2px;
+            color: #ddd;
+            font-weight: 800;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* MEDIA QUERIES POUR ADAPTER L'AFFICHAGE SUR ECRANS MOBILES */
+        @media (max-width: 850px) {
+            #touch-controls { display: flex; }
+            .hint-bar { display: none !important; }
+
+            /* Adaptation RPG */
+            #pokemon-game { align-items: flex-start; padding-top: 15px; }
+            #rpg-container { width: 95vw; height: 71.25vw; border-width: 2px; }
+            #dialog-box { font-size: 9px; line-height: 1.4; padding: 10px; bottom: 5px; height: 50px; left: 5px; right: 5px; }
+            .battle-top { padding: 10px; }
+            .battle-sprite { font-size: 40px !important; margin: 5px !important; text-shadow: 3px 3px 0 #ccc; }
+            .hp-box { width: 110px !important; margin-top: 10px !important; padding: 5px !important; border-width: 2px; }
+            .hp-box > div:first-child { font-size: 9px !important; }
+            #battle-log { font-size: 10px !important; padding: 5px !important; }
+            #battle-menu { padding: 5px !important; gap: 5px !important; height: auto; border-width: 2px; }
+            .battle-btn { font-size: 9px !important; padding: 10px 5px !important; border-width: 2px; }
+
+            /* Adaptation DRONE */
+            #drone-wrapper { transform: translate(-50%, -50%) scale(0.5) !important; }
+            
+            .minimap { top: 70px; left: 10px; bottom: auto; width: 100px; height: 100px; border-width: 2px; z-index: 50; }
+            #objective-banner { font-size: 0.75rem; padding: 8px 15px; text-align: center; }
+            #boss-ui-container { width: 95%; margin-top: 10px; }
+            #boss-name { font-size: 1.1rem; }
+            #info-card { 
+                width: 85%; max-height: 50vh; right: auto; left: 50%; top: 40%; 
+                transform: translate(-50%, -50%) scale(0.9) !important;
+                visibility: hidden; opacity: 0; padding: 15px; font-size: 0.85rem;
+            }
+            #info-card.visible { visibility: visible; opacity: 1; transform: translate(-50%, -50%) scale(1) !important; }
+            
+            /* CV Final Full Screen sur Mobile */
+            #info-card.final {
+                width: 100vw !important;
+                height: 100vh !important;
+                max-height: 100vh !important;
+                top: 0 !important;
+                left: 0 !important;
+                transform: none !important;
+                border-radius: 0 !important;
+                border: none !important;
+                background: rgba(15, 15, 20, 0.98);
+                z-index: 999999;
+                box-sizing: border-box;
+            }
+
+            .cv-header h2 { font-size: 1.3rem; }
+            .cv-section h3 { font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- === TOUCH CONTROLS (AJOUT) === -->
+<div id="touch-controls">
+    <div class="t-dpad">
+        <button class="t-btn t-up" id="t-up">▲</button>
+        <button class="t-btn t-left" id="t-left">◀</button>
+        <button class="t-btn t-right" id="t-right">▶</button>
+        <button class="t-btn t-down" id="t-down">▼</button>
+    </div>
+    <div class="t-actions">
+        <button class="t-btn t-action" id="t-b">🚀<br><span>(B)</span></button>
+        <button class="t-btn t-action" id="t-a">🎯<br><span>(A)</span></button>
+    </div>
+</div>
+
+<!-- === PARTIE POKEMON RPG === -->
+<div id="pokemon-game">
+    <div id="rpg-container">
+        <canvas id="rpg-canvas" width="640" height="480"></canvas>
+        
+        <div id="dialog-box">
+            <span id="dialog-text"></span><span class="blinking-cursor">_</span>
+        </div>
+
+        <div id="battle-screen">
+            <div class="battle-top">
+                <div class="hp-box" style="margin-top: 50px;">
+                    <div id="enemy-name">Danseur de Salsa</div>
+                    <div class="hp-bar-bg"><div class="hp-bar-fill" id="enemy-hp-fill"></div></div>
+                </div>
+                <div class="battle-sprite" id="enemy-sprite">🕺</div>
+            </div>
+            
+            <div class="battle-top" style="justify-content: flex-start; padding-top: 0;">
+                <div class="battle-sprite" id="player-sprite" style="margin-right: 50px; margin-top: 30px;">⚡</div>
+                <div class="hp-box" style="margin-top: 80px;">
+                    <div id="player-name">Électronique</div>
+                    <div class="hp-bar-bg"><div class="hp-bar-fill" id="player-hp-fill"></div></div>
+                </div>
+            </div>
+
+            <div id="battle-log">Un combat sauvage commence !</div>
+
+            <div id="battle-menu">
+                <button class="battle-btn" id="atk1-btn" onclick="useAttack('eclair')">Attaque Eclair</button>
+                <button class="battle-btn" id="atk2-btn" onclick="useAttack('courtcircuit')">Court-circuit</button>
+                <button class="battle-btn" id="catch-btn" onclick="usePokeball()" style="display:none; grid-column: span 2;">Lancer Pokéball</button>
+            </div>
+            <div class="battle-flash" id="battle-flash"></div>
+        </div>
+    </div>
+</div>
+
+<!-- === PARTIE DRONE FPV === -->
+<div id="drone-game">
+    <div id="damage-flash"></div>
+    <div id="viewport">
+        <div id="world">
+            <div class="biome" id="biome-forest"></div>
+            <div class="biome" id="biome-mountain"></div>
+            <div class="biome" id="biome-beach"></div>
+            <div class="biome" id="biome-bando"></div>
+            
+            <div id="dragon-target-line"></div>
+            <div id="boss-dragon">
+                <div class="dragon-shadow"></div>
+                <div class="dragon-body-wrapper" id="dragon-sprite">
+                    <div class="dragon-wing left"></div>
+                    <div class="dragon-wing right"></div>
+                    <div class="dragon-tail"></div>
+                    <div class="dragon-body">
+                        <div class="dragon-head">
+                            <div class="dragon-eye"></div>
+                            <div class="dragon-snout"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="drone-wrapper">
+                <div class="drone-shadow" id="drone-shadow"></div>
+                <div id="drone">
+                    <div class="chassis"></div>
+                    <div class="arm arm-1"><div class="motor"></div><div class="rotor"></div></div>
+                    <div class="arm arm-2"><div class="motor"></div><div class="rotor"></div></div>
+                    <div class="arm arm-3"><div class="motor"></div><div class="rotor"></div></div>
+                    <div class="arm arm-4"><div class="motor"></div><div class="rotor"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ui-layer">
+        <div id="top-ui">
+            <div id="objective-banner">🎯 Objectif : Visitez les zones (0/4)</div>
+            <div id="boss-ui-container">
+                <div id="boss-name">DRAGON GARDIEN DES DONNÉES</div>
+                <div id="boss-hp-bg"><div id="boss-hp-fill"></div></div>
+            </div>
+        </div>
+
+        <div id="info-card"></div>
+
+        <div class="minimap" id="minimap">
+            <div class="mm-f"></div><div class="mm-m"></div><div class="mm-b"></div><div class="mm-u"></div>
+            <div class="mini-player" id="mini-player"></div>
+            <div class="mini-boss" id="mini-boss"></div>
+        </div>
+
+        <div class="hint-bar">
+            <div class="controls-hint">Déplacement: <span class="key-btn">Z Q S D</span></div>
+            <div class="controls-hint" style="border-color:var(--primary); color:var(--primary);">TIRER: <span class="key-btn">CLIC</span> ou <span class="key-btn">ENTRÉE</span></div>
+            <div class="controls-hint" style="border-color:#ffcc00; color:#ffcc00;">ESQUIVE / LOOPING: <span class="key-btn">ESPACE</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* =========================================================================
+   PARTIE 0 : GESTION DES BOUTONS TACTILES (AJOUT)
+   ========================================================================= */
+function bindTouch(id, key, code) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    let interval = null;
+
+    const start = (e) => {
+        if (e && e.cancelable) e.preventDefault();
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: key, code: code }));
+        
+        // Maintenir enfoncé = répétition de touche pour se déplacer dans le RPG
+        if (isRPGActive &&['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+            if (interval) clearInterval(interval);
+            interval = setInterval(() => {
+                window.dispatchEvent(new KeyboardEvent('keydown', { key: key, code: code }));
+            }, 150);
+        }
+    };
+
+    const end = (e) => {
+        if (e && e.cancelable) e.preventDefault();
+        if (interval) clearInterval(interval);
+        window.dispatchEvent(new KeyboardEvent('keyup', { key: key, code: code }));
+    };
+
+    btn.addEventListener('touchstart', start, { passive: false });
+    btn.addEventListener('touchend', end, { passive: false });
+    // Souris (pour tester sur PC en simulant le mobile)
+    btn.addEventListener('mousedown', start);
+    btn.addEventListener('mouseup', end);
+    btn.addEventListener('mouseleave', end);
+}
+
+bindTouch('t-up', 'ArrowUp', 'ArrowUp');
+bindTouch('t-down', 'ArrowDown', 'ArrowDown');
+bindTouch('t-left', 'ArrowLeft', 'ArrowLeft');
+bindTouch('t-right', 'ArrowRight', 'ArrowRight');
+bindTouch('t-a', 'Enter', 'Enter');
+bindTouch('t-b', ' ', 'Space');
+
+/* =========================================================================
+   PARTIE 1 : MOTEUR RPG (POKEMON)
+   ========================================================================= */
+const canvas = document.getElementById('rpg-canvas');
+const ctx = canvas.getContext('2d');
+const dialogBox = document.getElementById('dialog-box');
+const dialogText = document.getElementById('dialog-text');
+const battleScreen = document.getElementById('battle-screen');
+
+let isRPGActive = true;
+let rpgState = 'EXPLORE'; // EXPLORE, DIALOG, BATTLE
+let currentMap = 'LAB';
+
+const TILE = 40;
+const MAP_W = 16, MAP_H = 12;
+
+// Maps: 0=Sol, 1=Mur, 2=Porte, 3=Herbe, 4=Table
+const maps = {
+    LAB: [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,4,4,4,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,2,2,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ],
+    TOWN: [[3,3,3,3,3,1,1,2,2,1,1,3,3,3,3,3],[3,3,3,3,3,0,0,0,0,0,0,3,3,3,3,3],[3,3,3,3,3,0,0,0,0,0,0,3,3,3,3,3],[3,3,3,0,0,0,0,0,0,0,0,0,0,3,3,3],[3,3,3,0,0,0,0,0,0,0,0,0,0,3,3,3],[3,3,0,0,0,0,0,0,0,0,0,0,0,0,3,3],[3,3,0,0,0,0,0,0,0,0,0,0,0,0,3,3],[3,3,3,0,0,0,0,0,0,0,0,0,0,3,3,3],[3,3,3,0,0,0,0,0,0,0,0,0,0,3,3,3],[3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],[3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],[3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3],
+    ]
+};
+
+let player = { x: 8, y: 7, dir: 'UP', emoji: '🧢' };
+let entities =[];
+
+// Scénario Flags
+let flagPickBall = false;
+let flagBeatRival = false;
+
+function setupEntities() {
+    if(currentMap === 'LAB') {
+        entities =[
+            { id: 'chen', x: 8, y: 2, emoji: '👨‍🔬', interact: () => playDialog([
+                "Prof. Chen : Bravo pour ton diplôme de Master Sciences De l'Ingénieur à l'UPMC !",
+                "Tu as 5 années d'études à apprende l'électronique, informatique et autres. Choisis ton avenir...",
+                "Sur la table, tu as : Electronique, Informatique et Danseur de Salsa."
+            ])},
+            { id: 'ball1', x: 7, y: 4, emoji: '🔴', interact: () => playDialog(["Pokeball Informatique. C'est vraiment intéressant."]) },
+            { id: 'ball2', x: 8, y: 4, emoji: '🔴', interact: pickElectronique },
+            { id: 'ball3', x: 9, y: 4, emoji: '🔴', interact: () => playDialog(["Pokeball Danseur de Salsa. Laissons ça au rival..."]) }
+        ];
+    } else if (currentMap === 'TOWN') {
+        player.y = 2; // spawn point in town
+        entities =[
+            { id: 'npc1', x: 4, y: 4, emoji: '🧑', interact: () => playDialog(["Mec 1 : Corentin a travaillé chez Valeo !", "Il a fait le design de cartes électroniques pour des chargeurs (OBC) de voitures électriques."]) },
+            { id: 'npc2', x: 10, y: 6, emoji: '👩', interact: () => playDialog(["Fille 1 : J'ai vu son profil. 5 ans d'expérience en hardware !", "Thales, Sagemcom, Faurecia, Lincoln Electric... Quel parcours !"]) },
+            { id: 'npc3', x: 6, y: 8, emoji: '👴', interact: () => playDialog(["Papy : Chez Thales AES, il a conçu une carte interconnexion pour l'aéronautique.", "Ah, l'électronique de puissance, c'est du solide !"]) }
+        ];
+    }
+}
+
+// Variables pour le système de dialogue
+let dialogQueue =[];
+let currentDialog = "";
+let charIndex = 0;
+let dialogCallback = null;
+let isTyping = false;
+
+function playDialog(texts, callback = null) {
+    rpgState = 'DIALOG';
+    dialogQueue = texts;
+    dialogCallback = callback;
+    dialogBox.style.display = 'block';
+    nextDialog();
+}
+
+function nextDialog() {
+    if (dialogQueue.length === 0) {
+        dialogBox.style.display = 'none';
+        rpgState = 'EXPLORE';
+        if(dialogCallback) dialogCallback();
+        return;
+    }
+    currentDialog = dialogQueue.shift();
+    dialogText.innerHTML = "";
+    charIndex = 0;
+    isTyping = true;
+    typeChar();
+}
+
+function typeChar() {
+    if(!isTyping) return;
+    if (charIndex < currentDialog.length) {
+        dialogText.innerHTML += currentDialog.charAt(charIndex);
+        charIndex++;
+        setTimeout(typeChar, 15);
+    } else {
+        isTyping = false;
+    }
+}
+
+// Séquence Choix & Rival
+function pickElectronique() {
+    if(flagPickBall) return playDialog(["Tu as déjà choisi Electronique !"]);
+    playDialog([
+        "Vous avez choisi la voie ÉLECTRONIQUE ! ( Master SDI à l' UPMC)",
+        "..."
+    ], () => {
+        entities = entities.filter(e => e.id !== 'ball2' && e.id !== 'ball3'); // on garde info ou on l'enlève
+        flagPickBall = true;
+        // Fait spawn le rival
+        let rival = { id: 'rival', x: 8, y: 8, emoji: '🕺', interact: ()=>{} };
+        entities.push(rival);
+        playDialog([
+            "Rival : Hé ! Puisque tu as pris Electronique...",
+            "Moi je prends DANSEUR DE SALSA !",
+            "Le combat commence !"
+        ], () => startBattle('RIVAL'));
+    });
+}
+
+// ---- COMBAT SYSTEM ----
+let battleType = 'RIVAL';
+let enemyHP = 100, playerHP = 100;
+
+function startBattle(type) {
+    rpgState = 'BATTLE';
+    battleType = type;
+    enemyHP = 100; playerHP = 100;
+    updateHPBars();
+    battleScreen.style.display = 'flex';
+    
+    if(type === 'RIVAL') {
+        document.getElementById('enemy-name').innerText = "Rival (Danseur de Salsa)";
+        document.getElementById('enemy-sprite').innerText = "🕺";
+        document.getElementById('player-name').innerText = "Électronique";
+        document.getElementById('player-sprite').innerText = "⚡";
+        document.getElementById('battle-log').innerText = "Le Rival envoie Danseur de Salsa !";
+        
+        document.getElementById('atk1-btn').style.display = 'block';
+        document.getElementById('atk2-btn').style.display = 'block';
+        document.getElementById('catch-btn').style.display = 'none';
+    } else if (type === 'WILD') {
+        document.getElementById('enemy-name').innerText = "DEV WEB Full Stack Sauvage";
+        document.getElementById('enemy-sprite').innerText = "💻";
+        document.getElementById('player-name').innerText = "Électronique";
+        document.getElementById('player-sprite').innerText = "⚡";
+        document.getElementById('battle-log').innerText = "Un DEV WEB Full Stack sauvage apparaît !";
+
+        document.getElementById('atk1-btn').style.display = 'none';
+        document.getElementById('atk2-btn').style.display = 'none';
+        document.getElementById('catch-btn').style.display = 'block';
+    }
+}
+
+function updateHPBars() {
+    document.getElementById('enemy-hp-fill').style.width = Math.max(0, enemyHP) + '%';
+    document.getElementById('player-hp-fill').style.width = Math.max(0, playerHP) + '%';
+}
+
+function battleAnim(targetId) {
+    let f = document.getElementById('battle-flash');
+    f.style.opacity = 1; f.style.background = 'white';
+    setTimeout(()=> f.style.opacity = 0, 100);
+}
+
+function useAttack(atk) {
+    if(enemyHP <= 0 || playerHP <= 0) return;
+    let log = document.getElementById('battle-log');
+    
+    if(atk === 'eclair') log.innerText = "Électronique utilise Attaque Éclair !";
+    else log.innerText = "Électronique utilise Court-circuit !";
+    
+    battleAnim('enemy');
+    enemyHP -= 55; updateHPBars();
+
+    if(enemyHP <= 0) {
+        log.innerText = "Danseur de Salsa est K.O. ! Vous avez gagné !";
+        setTimeout(() => endBattle(true), 2000);
+        return;
+    }
+
+    // Tour du rival
+    setTimeout(() => {
+        let rAtk = Math.random() > 0.5 ? "Pas de chacha" : "Lancer de partenaire";
+        log.innerText = `Rival utilise ${rAtk} !`;
+        battleAnim('player');
+        playerHP -= 20; updateHPBars();
+    }, 1500);
+}
+
+function usePokeball() {
+    document.getElementById('battle-log').innerText = "Vous lancez une Pokéball ! ... 1 ... 2 ... 3 ...";
+    setTimeout(() => {
+        document.getElementById('battle-log').innerText = "Capturé ! DEV WEB FULL STACK est ajouté au profil !";
+        setTimeout(() => endBattle(true), 2000);
+    }, 2000);
+}
+
+function endBattle(won) {
+    battleScreen.style.display = 'none';
+    if(battleType === 'RIVAL') {
+        flagBeatRival = true;
+        playDialog([
+            "Prof. Chen : Bravo ! L'électronique triomphe de la salsa !",
+            "Sors du bâtiment, tu peux discuter avec les bots pour en savoir plus, quand tu sera prêt, pars explorer le monde en traversant les hautes herbes! (et le reste du CV) !"
+        ]);
+        entities = entities.filter(e => e.id !== 'rival'); // Enlève le rival
+    } else if (battleType === 'WILD') {
+        // Séquence finale avant Drone
+        playDialog([
+            "Ah mais celui-là est super ! Je vais utiliser DEV FULL STACK, c'est sûr !",
+            "Voyons ses attaques... React, Node.js, Angular, Python, PHP, SQL...",
+            "Mais il y a beaucoup trop d'attaques à apprendre !!",
+            "Mmmh... Les DRONES ça a l'air vachement stylé aussi !",
+            "Passons aux choses sérieuses !"
+        ], () => {
+            // TRANSITION VERS DRONE
+            isRPGActive = false;
+            document.getElementById('pokemon-game').style.display = 'none';
+            document.getElementById('drone-game').style.display = 'block';
+            droneActive = true;
+            buildWorld();
+            updateDrone();
+        });
+    }
+}
+
+// ---- INPUTS & UPDATES RPG ----
+window.addEventListener('keydown', (e) => {
+    if(!isRPGActive) return;
+    
+    if (rpgState === 'DIALOG') {
+        if(e.code === 'Enter' || e.code === 'Space') {
+            if(isTyping) { isTyping = false; dialogText.innerHTML = currentDialog; }
+            else nextDialog();
+        }
+        return;
+    }
+
+    if (rpgState === 'EXPLORE') {
+        let nx = player.x, ny = player.y;
+        if(e.key === 'ArrowUp' || e.key === 'z') { ny--; player.dir = 'UP'; }
+        else if(e.key === 'ArrowDown' || e.key === 's') { ny++; player.dir = 'DOWN'; }
+        else if(e.key === 'ArrowLeft' || e.key === 'q') { nx--; player.dir = 'LEFT'; }
+        else if(e.key === 'ArrowRight' || e.key === 'd') { nx++; player.dir = 'RIGHT'; }
+        else if(e.code === 'Enter' || e.code === 'Space') {
+            // Interaction
+            let tx = player.x, ty = player.y;
+            if(player.dir==='UP') ty--; else if(player.dir==='DOWN') ty++;
+            else if(player.dir==='LEFT') tx--; else if(player.dir==='RIGHT') tx++;
+            
+            let ent = entities.find(e => e.x === tx && e.y === ty);
+            if(ent) ent.interact();
+            return;
+        }
+
+        if(nx !== player.x || ny !== player.y) {
+            let mapData = maps[currentMap];
+            if(ny>=0 && ny<MAP_H && nx>=0 && nx<MAP_W) {
+                let tile = mapData[ny][nx];
+                if(tile === 0 || tile === 2 || tile === 3) {
+                    // Check entity collision
+                    if(!entities.some(e => e.x === nx && e.y === ny)) {
+                        player.x = nx; player.y = ny;
+                        
+                        // Door transition
+                        if(tile === 2 && currentMap === 'LAB' && flagBeatRival) {
+                            currentMap = 'TOWN';
+                            setupEntities();
+                        } else if(tile === 2 && currentMap === 'LAB' && !flagBeatRival) {
+                            playDialog(["Prof Chen : Minute Papillon ! Prends d'abord ton avenir en main !"]);
+                            player.y--; // recule
+                        }
+
+                        // Wild Grass encounter
+                        if(tile === 3 && currentMap === 'TOWN') {
+                            if(Math.random() < 0.1) startBattle('WILD');
+                        }
+                    }
+                }
+            }
+        }
+    }
+});
+
+function drawRPG() {
+    if(!isRPGActive) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    let mapData = maps[currentMap];
+    
+    // Draw Map
+    for(let y=0; y<MAP_H; y++) {
+        for(let x=0; x<MAP_W; x++) {
+            let t = mapData[y][x];
+            ctx.fillStyle = t===1 ? '#555' : t===0 ? '#E8DDB5' : t===2 ? '#8B4513' : t===3 ? '#78C850' : t===4 ? '#CD853F' : 'black';
+            ctx.fillRect(x*TILE, y*TILE, TILE, TILE);
+            
+            // Grid lines for grass or floor
+            if(t===0 || t===3) {
+                ctx.strokeStyle = 'rgba(0,0,0,0.05)';
+                ctx.strokeRect(x*TILE, y*TILE, TILE, TILE);
+            }
+            if(t===3) {
+                ctx.fillStyle = '#65A840'; ctx.fillRect(x*TILE+5, y*TILE+10, 5, 10);
+                ctx.fillRect(x*TILE+25, y*TILE+20, 5, 10);
+            }
+        }
+    }
+
+    // Draw Entities
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    entities.forEach(e => {
+        ctx.fillText(e.emoji, e.x*TILE + TILE/2, e.y*TILE + TILE/2);
+    });
+
+    // Draw Player
+    ctx.fillText(player.emoji, player.x*TILE + TILE/2, player.y*TILE + TILE/2 - 5);
+
+    requestAnimationFrame(drawRPG);
+}
+
+setupEntities();
+requestAnimationFrame(drawRPG);
+
+
+/* =========================================================================
+   PARTIE 2 : MOTEUR DRONE FPV (JEU ORIGINAL INJECTÉ)
+   ========================================================================= */
+
+let droneActive = false;
+
+const world = document.getElementById('world');
+const droneWrapper = document.getElementById('drone-wrapper');
+const drone = document.getElementById('drone');
+const shadow = document.getElementById('drone-shadow');
+const minimap = document.getElementById('minimap');
+const miniPlayer = document.getElementById('mini-player');
+const miniBoss = document.getElementById('mini-boss');
+const damageFlash = document.getElementById('damage-flash');
+const objBanner = document.getElementById('objective-banner');
+const bossUi = document.getElementById('boss-ui-container');
+const bossHpFill = document.getElementById('boss-hp-fill');
+const infoCard = document.getElementById('info-card');
+
+const WORLD_SIZE = 4000;
+const CENTER = WORLD_SIZE / 2;
+const DRONE_RADIUS = 35; 
+
+let pos = { x: CENTER, y: CENTER };
+let vel = { x: 0, y: 0 };
+const maxSpeed = 16;
+const accel = 1.2;
+const friction = 0.92;
+const keys = {};
+let isLooping = false; let loopProgress = 0; let droneRotation = 0; let canShoot = true;
+
+let obstacles =[]; let lasers =[]; let meteors =[];
+let visitedCount = 0; let bossSpawned = false; let bossDead = false; let gameWon = false;
+
+// Données des 4 zones (Lien avec le CV Electronique/Dev)
+const spotsData =[
+    { 
+        id: 'skills', x: 1000, y: 1000, label: 'COMPÉTENCES', color: '#8ae234', visited: false,
+        content: `<b>Compétences Tech (Nouvelle classe DEV)</b><br><span class="tag">React</span> <span class="tag">Next.js</span> <span class="tag">Angular</span><br><span class="tag">Node.js</span> <span class="tag">PHP</span> <span class="tag">Python</span><br><span class="tag">MySQL</span> <span class="tag">Git</span><br><br><b>Anciennes attaques (HW) :</b><br><span class="tag">Conception PCB</span> <span class="tag">Altium</span>`
+    },
+    { 
+        id: 'exp', x: 3000, y: 1000, label: 'EXPÉRIENCES', color: '#ffb300', visited: false,
+        content: `<b>Dev Full Stack (Stage 2026)</b> - Ilaria Digital<br>Création de plateforme E-learning.<br><br><b>Ingénieur Hardware (2017-2024)</b><br><i>Valeo, Sagemcom, Lincoln Electric, Thales</i><br>7 ans d'expertise en électronique et debug.`
+    },
+    { 
+        id: 'formation', x: 1000, y: 3000, label: 'FORMATIONS', color: '#4ea5d9', visited: false,
+        content: `<b>Dev Full Stack (2025-2026)</b><br>Ilaria Digital School - Titre RNCP Niv 6.<br><br><b>Master Sciences de l'Ingénieur (2017)</b><br>Sorbonne Université (UPMC) - Robotique.`
+    },
+    { 
+        id: 'projects', x: 3000, y: 3000, label: 'PROJETS', color: '#ff3366', visited: false,
+        content: `<b>Droonity.com</b> : Réseau social dédié aux pilotes FPV (React, Node, SQL).<br><b>corentinchan.de</b> : App de recettes interactive.`
+    }
+];
+
+let boss = { el: document.getElementById('boss-dragon'), sprite: document.getElementById('dragon-sprite'), line: document.getElementById('dragon-target-line'), x: 0, y: 0, vx: 0, vy: 0, hp: 300, maxHp: 300, state: 'CHASE', timer: 0, diveTarget: {x:0, y:0} };
+
+function buildWorld() {
+    for(let i=0; i<80; i++) {
+        let x = Math.random() * (WORLD_SIZE - 200) + 100;
+        let y = Math.random() * (WORLD_SIZE - 200) + 100;
+        if(Math.hypot(x - CENTER, y - CENTER) < 400) continue; 
+        if(spotsData.some(s => Math.hypot(x - s.x, y - s.y) < 300)) continue;
+
+        let type = ''; let r = 0; let w = 0; let h = 0;
+        if(x < CENTER && y < CENTER) { type = 'obs-tree'; r = 40 + Math.random()*40; }
+        else if(x >= CENTER && y < CENTER) { type = 'obs-rock'; r = 60 + Math.random()*60; }
+        else if(x < CENTER && y >= CENTER) { type = 'obs-palm'; r = 30 + Math.random()*20; }
+        else { type = 'obs-wall'; w = 150 + Math.random()*200; h = 30; if(Math.random()>0.5){ h=w; w=30; } }
+
+        const el = document.createElement('div'); el.className = `obstacle ${type}`;
+        el.style.left = x + 'px'; el.style.top = y + 'px';
+        if(r) { el.style.width = (r*2)+'px'; el.style.height = (r*2)+'px'; obstacles.push({type:'circle', x,y, r}); }
+        else { el.style.width = w+'px'; el.style.height = h+'px'; obstacles.push({type:'rect', x,y, w,h}); }
+        world.appendChild(el);
+    }
+
+    spotsData.forEach(s => {
+        const container = document.createElement('div');
+        container.className = `cv-zone`; container.id = `spot-${s.id}`;
+        container.style.left = s.x + 'px'; container.style.top = s.y + 'px';
+        container.innerHTML = `<div class="zone-label">${s.label}</div><div class="landing-pad"></div>`;
+        world.appendChild(container);
+
+        // Positionnement dynamique de la minimap avec des % au lieu de pixels fixes
+        const miniZone = document.createElement('div'); miniZone.className = 'mini-zone';
+        miniZone.style.left = (s.x / WORLD_SIZE * 100) + '%';
+        miniZone.style.top = (s.y / WORLD_SIZE * 100) + '%';
+        miniZone.style.width = (300 / WORLD_SIZE * 100) + '%';
+        miniZone.style.height = (300 / WORLD_SIZE * 100) + '%';
+        minimap.appendChild(miniZone);
+    });
+}
+
+// Inputs spécifiques au Drone (bloqués si on est sur RPG)
+window.addEventListener('keydown', e => {
+    if(!droneActive) return;
+    keys[e.key.toLowerCase()] = true;
+    if(e.code === 'Space' && !isLooping) {
+        isLooping = true; loopProgress = 0;
+        vel.x += Math.cos((droneRotation - 90) * Math.PI / 180) * 8;
+        vel.y += Math.sin((droneRotation - 90) * Math.PI / 180) * 8;
+    }
+    if(e.code === 'Enter') shootLaser();
+});
+window.addEventListener('keyup', e => { if(droneActive) keys[e.key.toLowerCase()] = false; });
+window.addEventListener('mousedown', () => { if(droneActive) shootLaser(); });
+
+function shootLaser() {
+    if(!canShoot || (!bossSpawned || bossDead)) return;
+    canShoot = false; setTimeout(() => canShoot = true, 150); 
+    let rad = (droneRotation - 90) * Math.PI / 180;
+    let laserEl = document.createElement('div'); laserEl.className = 'laser';
+    laserEl.style.transform = `translate(-50%, -50%) rotate(${droneRotation - 90}deg)`;
+    world.appendChild(laserEl);
+    lasers.push({ el: laserEl, x: pos.x, y: pos.y, vx: Math.cos(rad) * 35, vy: Math.sin(rad) * 35, life: 40 });
+}
+
+function spawnMeteor(tx, ty) {
+    let warnEl = document.createElement('div'); warnEl.className = 'meteor-warning';
+    warnEl.style.left = tx + 'px'; warnEl.style.top = ty + 'px'; world.appendChild(warnEl);
+    let metEl = document.createElement('div'); metEl.className = 'meteor';
+    metEl.style.left = tx + 'px'; metEl.style.top = ty + 'px'; metEl.style.display = 'none'; world.appendChild(metEl);
+    meteors.push({ warn: warnEl, met: metEl, x: tx, y: ty, timer: 70, active: true });
+}
+
+function takeDamagePlayer() {
+    if(isLooping && (loopProgress > 30 && loopProgress < 330)) return; 
+    damageFlash.style.opacity = 1; setTimeout(() => damageFlash.style.opacity = 0, 100);
+    vel.x = (Math.random() - 0.5) * 40; vel.y = (Math.random() - 0.5) * 40;
+}
+
+function spawnDragon() {
+    bossSpawned = true; boss.x = pos.x + 800; boss.y = pos.y - 800; 
+    boss.el.style.display = 'block'; bossUi.style.display = 'block'; miniBoss.style.display = 'block';
+    objBanner.innerHTML = "⚠️ ALERTE : VAINCRE LE DRAGON !"; objBanner.style.borderColor = "var(--danger)"; objBanner.style.color = "var(--danger)"; objBanner.style.boxShadow = "0 0 30px var(--danger)";
+}
+
+function displayFinalCV() {
+    gameWon = true;
+    let html = `
+        <div class="cv-header">
+            <h2 style="color:var(--primary)">Corentin Chan</h2>
+            <p>DÉVELOPPEUR WEB Full Stack</p>
+            <p style="font-size:0.8rem; margin-top:5px;">📧 corentin.chan@gmail.com | 📞 07 50 58 11 77</p>
+        </div>
+    `;
+    spotsData.forEach(s => {
+        html += `<div class="cv-section" style="border-left-color:${s.color}">
+                    <h3 style="color:${s.color}; font-size:1.1rem; margin:0 0 8px 0;">${s.label}</h3>
+                    <div style="font-size:0.95rem; line-height:1.4;">${s.content}</div>
+                 </div>`;
+    });
+    html += `<button style="width:100%; padding:15px; background:var(--primary); color:#000; border:none; border-radius:5px; font-weight:900; font-size:1.1rem; cursor:pointer; text-transform:uppercase; box-shadow: 0 0 15px var(--primary); margin-top:10px;" onclick="alert('PDF du CV Téléchargé avec succès !')">📥 TÉLÉCHARGER LE CV (PDF)</button>`;
+    
+    infoCard.innerHTML = html;
+    infoCard.style.borderLeftColor = "var(--primary)";
+    infoCard.classList.add('visible', 'final'); // On ajoute "final" pour le plein écran CSS
+
+    // Cache les boutons tactiles pour faciliter la lecture sur mobile
+    if (window.matchMedia("(max-width: 850px)").matches) {
+        const tc = document.getElementById('touch-controls');
+        if(tc) tc.style.display = 'none';
+    }
+}
+
+function updateDrone() {
+    if(!droneActive) return;
+
+    if (keys['arrowup'] || keys['z']) vel.y -= accel;
+    if (keys['arrowdown'] || keys['s']) vel.y += accel;
+    if (keys['arrowleft'] || keys['q']) vel.x -= accel;
+    if (keys['arrowright'] || keys['d']) vel.x += accel;
+
+    let speed = Math.hypot(vel.x, vel.y);
+    if (speed > maxSpeed && !isLooping) { vel.x = (vel.x / speed) * maxSpeed; vel.y = (vel.y / speed) * maxSpeed; }
+    vel.x *= friction; vel.y *= friction;
+    if(speed < 0.1) { vel.x = 0; vel.y = 0; }
+    if(speed > 1) droneRotation = Math.atan2(vel.y, vel.x) * 180 / Math.PI + 90;
+
+    let nextX = pos.x + vel.x; let nextY = pos.y + vel.y;
+    
+    if (nextX < DRONE_RADIUS) { nextX = DRONE_RADIUS; vel.x *= -0.5; }
+    if (nextY < DRONE_RADIUS) { nextY = DRONE_RADIUS; vel.y *= -0.5; }
+    if (nextX > WORLD_SIZE - DRONE_RADIUS) { nextX = WORLD_SIZE - DRONE_RADIUS; vel.x *= -0.5; }
+    if (nextY > WORLD_SIZE - DRONE_RADIUS) { nextY = WORLD_SIZE - DRONE_RADIUS; vel.y *= -0.5; }
+
+    if(!isLooping || (isLooping && (loopProgress <= 45 || loopProgress >= 315))) {
+        obstacles.forEach(obs => {
+            if(obs.type === 'circle') {
+                let dist = Math.hypot(nextX - obs.x, nextY - obs.y);
+                if (dist < DRONE_RADIUS + obs.r) {
+                    let ang = Math.atan2(nextY - obs.y, nextX - obs.x);
+                    nextX = obs.x + Math.cos(ang) * (DRONE_RADIUS + obs.r); nextY = obs.y + Math.sin(ang) * (DRONE_RADIUS + obs.r);
+                    vel.x *= -0.5; vel.y *= -0.5; 
+                }
+            } else if(obs.type === 'rect') {
+                let tx = nextX < obs.x ? obs.x : (nextX > obs.x + obs.w ? obs.x + obs.w : nextX);
+                let ty = nextY < obs.y ? obs.y : (nextY > obs.y + obs.h ? obs.y + obs.h : nextY);
+                let dist = Math.hypot(nextX - tx, nextY - ty);
+                if (dist < DRONE_RADIUS) {
+                    let ang = Math.atan2(nextY - ty, nextX - tx);
+                    nextX += Math.cos(ang) * (DRONE_RADIUS - dist); nextY += Math.sin(ang) * (DRONE_RADIUS - dist);
+                    vel.x *= -0.5; vel.y *= -0.5;
+                }
+            }
+        });
+    }
+    pos.x = nextX; pos.y = nextY;
+
+    let scaleAlt = 1; let loopPitch = 0;
+    if(isLooping) {
+        loopProgress += 12; 
+        if(loopProgress >= 360) { isLooping = false; loopProgress = 0; } 
+        else { loopPitch = -loopProgress; scaleAlt = 1 + Math.sin(loopProgress * Math.PI / 180) * 0.8; }
+    }
+    droneWrapper.style.left = pos.x + 'px'; droneWrapper.style.top = pos.y + 'px';
+    drone.style.transform = `scale(${scaleAlt}) rotateX(${-vel.y * 2 + loopPitch}deg) rotateY(${vel.x * 2}deg) rotateZ(${droneRotation}deg)`;
+    let shadowScale = 1 - ((scaleAlt - 1) * 0.4);
+    shadow.style.transform = `translate(-50%, -50%) translate(${-vel.x * 2}px, ${-vel.y * 2 + (scaleAlt-1)*50}px) scale(${shadowScale})`;
+
+    let hoveringSpot = null;
+    spotsData.forEach(s => {
+        let dist = Math.hypot(pos.x - s.x, pos.y - s.y);
+        if(dist < 150) {
+            hoveringSpot = s;
+            if(!s.visited) {
+                s.visited = true; 
+                visitedCount++;
+                document.getElementById(`spot-${s.id}`).classList.add('visited');
+                
+                if(visitedCount === 4 && !bossSpawned) {
+                    // C'est ici que l'on désactive le boss sur mobile (mais pas sur PC)
+                    if (window.matchMedia("(max-width: 850px)").matches) {
+                        bossSpawned = true;
+                        bossDead = true;
+                        objBanner.innerHTML = "🏆 FÉLICITATIONS ! CV COMPLET DÉVERROUILLÉ";
+                        objBanner.style.borderColor = "var(--primary)"; 
+                        objBanner.style.color = "var(--primary)";
+                        displayFinalCV();
+                    } else {
+                        spawnDragon();
+                    }
+                } else if(visitedCount < 4) {
+                    objBanner.innerHTML = `🎯 Objectif : Visitez les zones (${visitedCount}/4)`;
+                }
+            }
+        }
+    });
+
+    if(!gameWon) {
+        if(hoveringSpot && !bossSpawned) {
+            infoCard.innerHTML = `
+                <div class="cv-header">
+                    <h2 style="color:${hoveringSpot.color}">${hoveringSpot.label}</h2>
+                    <p style="color:#fff">Extraction de la donnée locale...</p>
+                </div>
+                <div style="font-size:1.05rem; line-height:1.6;">${hoveringSpot.content}</div>
+            `;
+            infoCard.style.borderLeftColor = hoveringSpot.color;
+            infoCard.classList.add('visible');
+        } else {
+            infoCard.classList.remove('visible');
+        }
+    }
+
+    for(let i = lasers.length - 1; i >= 0; i--) {
+        let l = lasers[i]; l.x += l.vx; l.y += l.vy; l.life--; l.el.style.left = l.x + 'px'; l.el.style.top = l.y + 'px';
+        if(!bossDead && bossSpawned && Math.hypot(l.x - boss.x, l.y - boss.y) < 120) {
+            boss.hp -= 10;
+            bossHpFill.style.width = Math.max(0, (boss.hp/boss.maxHp)*100) + '%';
+            boss.sprite.style.filter = 'brightness(2) sepia(1) hue-rotate(-50deg) saturate(5)';
+            setTimeout(() => boss.sprite.style.filter = 'none', 100);
+            
+            if(boss.hp <= 0 && !bossDead) {
+                bossDead = true; 
+                miniBoss.style.display = 'none';
+                objBanner.innerHTML = "🏆 FÉLICITATIONS ! CV COMPLET DÉVERROUILLÉ";
+                objBanner.style.borderColor = "var(--primary)"; 
+                objBanner.style.color = "var(--primary)";
+                displayFinalCV();
+            }
+            l.el.remove(); lasers.splice(i, 1); continue;
+        }
+        if(l.life <= 0) { l.el.remove(); lasers.splice(i, 1); }
+    }
+
+    if(bossSpawned && !bossDead) {
+        boss.timer++;
+        let dx = pos.x - boss.x; let dy = pos.y - boss.y;
+        let dist = Math.hypot(dx, dy); let ang = Math.atan2(dy, dx);
+
+        if(boss.state === 'CHASE') {
+            if(dist > 800) { boss.vx = Math.cos(ang) * 7; boss.vy = Math.sin(ang) * 7; } 
+            else if (dist < 500) { boss.vx = -Math.cos(ang) * 6; boss.vy = -Math.sin(ang) * 6; } 
+            else { boss.vx = Math.cos(ang + Math.PI/2) * 6; boss.vy = Math.sin(ang + Math.PI/2) * 6; }
+            
+            boss.x += boss.vx; boss.y += boss.vy;
+
+            if(boss.timer > 100) {
+                if(Math.random() < 0.3) { boss.state = 'PREP_DIVE'; boss.timer = 0; } 
+                else if (Math.random() < 0.8) { spawnMeteor(pos.x, pos.y); spawnMeteor(pos.x + vel.x*20, pos.y + vel.y*20); boss.timer = 40; } 
+                else boss.timer = 0;
+            }
+        } 
+        else if (boss.state === 'PREP_DIVE') {
+            boss.vx *= 0.8; boss.vy *= 0.8; boss.x += boss.vx; boss.y += boss.vy;
+            boss.line.style.display = 'block'; boss.line.style.left = boss.x + 'px'; boss.line.style.top = boss.y + 'px';
+            boss.line.style.width = dist + 'px'; boss.line.style.transform = `translateY(-50%) rotate(${ang}rad)`;
+
+            if(boss.timer > 50) {
+                boss.state = 'DIVE'; boss.timer = 0; boss.line.style.display = 'none';
+                boss.diveTarget = { vx: Math.cos(ang)*35, vy: Math.sin(ang)*35 };
+            }
+        }
+        else if (boss.state === 'DIVE') {
+            boss.x += boss.diveTarget.vx; boss.y += boss.diveTarget.vy;
+            if(dist < 120) takeDamagePlayer();
+            if(boss.timer > 40) { boss.state = 'CHASE'; boss.timer = 0; }
+        }
+
+        boss.el.style.left = boss.x + 'px'; boss.el.style.top = boss.y + 'px';
+        let flip = (boss.vx < 0 || (boss.state === 'PREP_DIVE' && dx < 0)) ? 'scaleX(-1)' : 'scaleX(1)';
+        boss.sprite.style.transform = `${flip}`;
+        
+    } else if (bossDead) {
+        boss.y += 15; boss.el.style.transform = `translate(-50%, -50%) rotate(${boss.y/10}deg)`;
+        boss.sprite.style.filter = 'grayscale(1) brightness(0.5)'; boss.line.style.display = 'none';
+    }
+
+    for(let i = meteors.length - 1; i >= 0; i--) {
+        let m = meteors[i]; m.timer--;
+        if(m.timer === 15) {
+            m.warn.style.display = 'none'; m.met.style.display = 'block';
+            m.met.style.transform = `translate(-50%, -50%) scale(4)`; m.met.style.transition = `transform 0.25s linear`;
+            void m.met.offsetWidth; m.met.style.transform = `translate(-50%, -50%) scale(1)`;
+        }
+        if(m.timer <= 0 && m.active) {
+            m.active = false; if(Math.hypot(pos.x - m.x, pos.y - m.y) < 120) takeDamagePlayer();
+            m.met.style.opacity = '0'; setTimeout(() => { m.warn.remove(); m.met.remove(); }, 300);
+        }
+    }
+    meteors = meteors.filter(m => m.timer > -20);
+
+    let camX = Math.max(0, Math.min(pos.x - window.innerWidth / 2, WORLD_SIZE - window.innerWidth));
+    let camY = Math.max(0, Math.min(pos.y - window.innerHeight / 2, WORLD_SIZE - window.innerHeight));
+    world.style.transform = `translate3d(${-camX}px, ${-camY}px, 0)`;
+    
+    // Positionnement mini-map dynamique (en %)
+    miniPlayer.style.left = (pos.x / WORLD_SIZE * 100) + '%'; 
+    miniPlayer.style.top = (pos.y / WORLD_SIZE * 100) + '%';
+    miniBoss.style.left = (boss.x / WORLD_SIZE * 100) + '%'; 
+    miniBoss.style.top = (boss.y / WORLD_SIZE * 100) + '%';
+
+    requestAnimationFrame(updateDrone);
+}
+</script>
+
+</body>
+</html>

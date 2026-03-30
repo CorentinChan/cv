@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corentin Chan - Hardcore CV Quest</title>
+    <style>
+        :root { --primary: #2c3e50; --danger: #e74c3c; --win: #27ae60; --sky: #1a2a6c; }
+        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; 
+               background: linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d); color: white; }
+
+        /* HUD & UI */
+        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
+        .hud-bar { position: absolute; width: 280px; height: 25px; background: rgba(0,0,0,0.5); border: 2px solid #fff; border-radius: 20px; overflow: hidden; }
+        #p-health-cont { top: 20px; left: 20px; }
+        #d-health-cont { top: 20px; right: 20px; display: none; border-color: var(--danger); }
+        .fill { width: 100%; height: 100%; transition: width 0.1s; }
+        #hp-fill { background: var(--win); }
+        #boss-hp-fill { background: var(--danger); }
+
+        #info-panel {
+            position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 850px; background: rgba(255,255,255,0.95);
+            padding: 20px; border-radius: 10px; color: #222; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; gap: 10px; border-left: 8px solid var(--danger);
+        }
+        #info-panel h2 { margin: 0; color: var(--danger); text-transform: uppercase; font-size: 1.2em; }
+        #info-panel .content { font-size: 0.95em; line-height: 1.4; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
+        .controls { font-size: 0.8em; font-weight: bold; background: #eee; padding: 5px; border-radius: 5px; text-align: center; }
+
+        /* JEU */
+        #game-world { position: relative; width: 100vw; height: 100vh; }
+        .entity { position: absolute; display: flex; align-items: center; justify-content: center; user-select: none; }
+        
+        /* Aigle flip direction */
+        #player { font-size: 65px; z-index: 50; transition: filter 0.2s; transform: scaleX(-1); }
+        .facing-left { transform: scaleX(1) !important; }
+        .facing-right { transform: scaleX(-1) !important; }
+        .invincible { filter: brightness(2) drop-shadow(0 0 20px gold) !important; }
+
+        #dragon { font-size: 140px; display: none; z-index: 60; filter: drop-shadow(0 0 20px red); }
+        .rock { font-size: 100px; filter: grayscale(0.5) contrast(1.2); z-index: 40; }
+        .fire-p { font-size: 30px; z-index: 45; }
+        .fire-d { font-size: 45px; z-index: 55; }
+
+        /* CV FINAL */
+        #final-cv {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff; display: none; overflow-y: auto; padding: 40px;
+            box-sizing: border-box; z-index: 200; color: #333;
+        }
+        .cv-wrap { max-width: 1000px; margin: auto; }
+        .cv-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 40px; margin-top: 30px; }
+        h1 { border-bottom: 4px solid var(--primary); padding-bottom: 10px; margin-bottom: 5px; }
+        h2 { background: var(--primary); color: white; padding: 5px 15px; font-size: 1.1em; }
+        .job { margin-bottom: 15px; border-left: 3px solid var(--danger); padding-left: 10px; }
+    </style>
+</head>
+<body>
+
+<div id="ui-layer">
+    <div id="p-health-cont" class="hud-bar"><div id="hp-fill" class="fill"></div></div>
+    <div id="d-health-cont" class="hud-bar"><div id="boss-hp-fill" class="fill"></div></div>
+    
+    <div id="info-panel">
+        <h2 id="lvl-title">ETAPE</h2>
+        <div id="lvl-content" class="content"></div>
+        <div class="controls">⌨️ Z,Q,S,D : Voler | MAJ : Piqué (Invincible + Dégâts) | ESPACE : Tirer</div>
+    </div>
+</div>
+
+<div id="game-world">
+    <div id="player" class="entity">🦅</div>
+    <div id="dragon" class="entity">🐲</div>
+</div>
+
+<div id="final-cv">
+    <div class="cv-wrap">
+        <center>
+            <h1>CORENTIN CHAN</h1>
+            <p><strong>Développeur Full Stack</strong> | Samois-sur-Seine | 07 50 58 11 77 | chancorentin@hotmail.com</p>
+            <p>🚗 Permis B | 👤 34 ans | 🌐 droonity.com</p>
+        </center>
+
+        <div class="cv-grid">
+            <div>
+                <h2>Compétences</h2>
+                <p><strong>Frontend:</strong> React, Angular, HTML/CSS/JS</p>
+                <p><strong>Backend:</strong> Node.js, PHP, Python, MySQL, PostGreSQL, Prisma</p>
+                <p><strong>Autres:</strong> C/C++, Hardware Engineering</p>
+                <p><strong>Langues:</strong> Français, Anglais</p>
+                
+                <h2>Formation</h2>
+                <p><strong>Ilaria Digital School (2026)</strong><br>Dévelloppeur Web Full Stack</p>
+                <p><strong>UPMC Paris VI (2017)</strong><br>Master Sciences de l'Ingénieur</p>
+            </div>
+            <div>
+                <h2>Profil</h2>
+                <p>Après 5 ans d’expérience ingénieur hardware, reconversion en full stack web. Passionné par les drones et créateur de <strong>Droonity</strong>.</p>
+                
+                <h2>Expérience</h2>
+                <div class="job">
+                    <strong>Dévellopeur Full Stack Web (2026)</strong><br>
+                    <em>Ilaria Digital School</em><br>Plateforme E-learning : Stripe, Calendrier, Vidéo.
+                </div>
+                <div class="job">
+                    <strong>Ingénieur Hardware (2017 – 2024)</strong><br>
+                    <em>Lincoln Electric · Valeo · Sagemcom</em><br>Conception de cartes électroniques complexes.
+                </div>
+
+                <h2>Projets Web</h2>
+                <p><strong>Droonity :</strong> Map interactive, portfolios, chat, events.</p>
+                <p><strong>Recipe App :</strong> Recherche, création, mode USER/ADMIN.</p>
+                <p><strong>Portfolio :</strong> gokhanprods.rf.gd</p>
+            </div>
+        </div>
+        <center><button onclick="location.reload()" style="margin:20px; padding:15px 30px; font-size:1.2em; cursor:pointer;">REJOUER L'AVENTURE</button></center>
+    </div>
+</div>
+
+<script>
+    const levels = [
+        {
+            t: "1. Profil & Contact",
+            c: `<div>📍 Samois-sur-Seine<br>📞 07 50 58 11 77<br>✉ chancorentin@hotmail.com<br>🚗 Permis B | 👤 34 ans</div>
+                <div>Après 5 ans en ingénierie hardware, je me suis orienté vers le web full stack. Passionné tech et fondateur de Droonity (drone community).</div>`
+        },
+        {
+            t: "2. Compétences & Formation",
+            c: `<div><b>STACK :</b> React, Angular, Node.js, PHP, Python, MySQL, Prisma, C/C++.<br><b>LANGUES :</b> Français, Anglais.</div>
+                <div><b>Ilaria Digital School (2026) :</b> Dév. Full Stack<br><b>UPMC Paris VI (2017) :</b> Master Ingénieur</div>`
+        },
+        {
+            t: "3. Expériences & Projets",
+            c: `<div><b>Expérience :</b> Dév Web (Ilaria), Ingénieur Hardware (7 ans chez Lincoln Electric, Valeo, Sagemcom).</div>
+                <div><b>Projets :</b> Droonity (React/Node), Recipe App, Video Portfolio.</div>`
+        },
+        {
+            t: "FINAL BOSS : LE RECRUTEMENT",
+            c: `<div style="grid-column: span 2; text-align:center; color:red; font-weight:bold;">LE DRAGON VOUS BLOQUE ! BATTEZ-LE POUR RÉVÉLER LE CV COMPLET !</div>`
+        }
+    ];
+
+    let state = {
+        lvl: 0, hp: 100, x: 100, y: 300,
+        keys: {}, diving: false, active: true,
+        bossHp: 100, bossY: 300, knockback: 0
+    };
+
+    // CONTROLES
+    document.addEventListener('keydown', e => {
+        state.keys[e.key.toLowerCase()] = true;
+        if(e.key === "Shift") activateDive();
+        if(e.key === " ") firePlayer();
+    });
+    document.addEventListener('keyup', e => state.keys[e.key.toLowerCase()] = false);
+
+    function activateDive() {
+        if(state.diving) return;
+        state.diving = true;
+        document.getElementById('player').classList.add('invincible');
+        setTimeout(() => {
+            state.diving = false;
+            document.getElementById('player').classList.remove('invincible');
+        }, 600);
+    }
+
+    function firePlayer() {
+        if(!state.active) return;
+        createProjectile(state.x + 60, state.y + 20, "fire-p", "🔥", 14, true);
+    }
+
+    function fireBoss() {
+        if(!state.active || state.lvl < 3 || state.bossHp <= 0) return;
+        createProjectile(window.innerWidth - 180, state.bossY + 60, "fire-d", "☄️", -12, false);
+    }
+    setInterval(fireBoss, 1200);
+
+    function createProjectile(x, y, cls, icon, speed, isPlayer) {
+        const p = document.createElement('div');
+        p.className = "entity " + cls; p.innerHTML = icon;
+        p.style.left = x + "px"; p.style.top = y + "px";
+        document.getElementById('game-world').appendChild(p);
+        let loop = setInterval(() => {
+            let curX = parseInt(p.style.left) + speed;
+            p.style.left = curX + "px";
+            if(isPlayer && curX > window.innerWidth - 220 && Math.abs(parseInt(p.style.top) - state.bossY) < 120) {
+                state.bossHp -= 4; p.remove(); clearInterval(loop);
+            }
+            if(!isPlayer && Math.abs(curX - state.x) < 50 && Math.abs(parseInt(p.style.top) - state.y) < 50) {
+                if(!state.diving) { state.hp -= 10; state.knockback = 15; }
+                p.remove(); clearInterval(loop);
+            }
+            if(curX < 0 || curX > window.innerWidth) { p.remove(); clearInterval(loop); }
+        }, 20);
+    }
+
+    // PIERRES MASSIVES
+    let rocks = [];
+    function spawnRock() {
+        if(!state.active || state.lvl === 0) return;
+        const r = document.createElement('div');
+        r.className = "entity rock"; r.innerHTML = "🪨";
+        let rx = Math.random() * (window.innerWidth - 300) + 300;
+        r.style.left = rx + "px";
+        document.getElementById('game-world').appendChild(r);
+        rocks.push({el: r, x: rx, y: -150, s: 5 + (state.lvl * 2)});
+    }
+    setInterval(spawnRock, 800); // Rafale de pierres
+
+    // LOOP
+    function update() {
+        if(!state.active) return;
+
+        let s = state.diving ? 18 : 8;
+        
+        // Knockback logic
+        if(state.knockback > 0) {
+            state.x -= state.knockback;
+            state.knockback -= 1;
+        }
+
+        if(state.keys['z']) state.y -= s;
+        if(state.keys['s']) state.y += s;
+        if(state.keys['q']) { state.x -= s; document.getElementById('player').classList.add('facing-left'); document.getElementById('player').classList.remove('facing-right'); }
+        if(state.keys['d']) { state.x += s; document.getElementById('player').classList.add('facing-right'); document.getElementById('player').classList.remove('facing-left'); }
+        if(state.diving) state.y += 10;
+
+        state.y = Math.max(0, Math.min(window.innerHeight - 100, state.y));
+        state.x = Math.max(0, state.x);
+
+        const pEl = document.getElementById('player');
+        pEl.style.left = state.x + "px"; pEl.style.top = state.y + "px";
+
+        // Changement Niveau
+        if(state.x > window.innerWidth - 100) {
+            if(state.lvl < 3) {
+                state.lvl++; state.x = 50; renderUI();
+            } else if(state.bossHp <= 0) {
+                win();
+            } else { state.x = window.innerWidth - 110; }
+        }
+
+        // Pierres Collision & Repoussement
+        rocks.forEach((r, i) => {
+            r.y += r.s;
+            r.el.style.top = r.y + "px";
+            if(!state.diving && Math.abs(r.x - state.x) < 80 && Math.abs(r.y - state.y) < 80) {
+                state.hp -= 20; 
+                state.knockback = 30; // Repousse violemment
+                r.el.remove(); rocks.splice(i, 1);
+            }
+            if(r.y > window.innerHeight) { r.el.remove(); rocks.splice(i, 1); }
+        });
+
+        // Boss
+        if(state.lvl === 3 && state.bossHp > 0) {
+            state.bossY += (state.y - state.bossY) * 0.06;
+            document.getElementById('dragon').style.top = state.bossY + "px";
+            document.getElementById('dragon').style.left = (window.innerWidth - 220) + "px";
+            document.getElementById('dragon').style.display = "block";
+            document.getElementById('d-health-cont').style.display = "block";
+            
+            if(state.diving && state.x > window.innerWidth - 300 && Math.abs(state.y - state.bossY) < 120) {
+                state.bossHp -= 1.5;
+                state.knockback = 5;
+            }
+        }
+
+        document.getElementById('hp-fill').style.width = state.hp + "%";
+        document.getElementById('boss-hp-fill').style.width = state.bossHp + "%";
+        
+        if(state.hp <= 0) { 
+            alert("Corentin a besoin de renfort ! Réessai."); 
+            state.hp = 100; state.x = 50; 
+        }
+
+        requestAnimationFrame(update);
+    }
+
+    function renderUI() {
+        document.getElementById('lvl-title').innerText = levels[state.lvl].t;
+        document.getElementById('lvl-content').innerHTML = levels[state.lvl].c;
+    }
+
+    function win() {
+        state.active = false;
+        document.getElementById('final-cv').style.display = "block";
+    }
+
+    renderUI();
+    update();
+</script>
+</body>
+</html>

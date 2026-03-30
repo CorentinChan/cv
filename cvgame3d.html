@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Corentin Chan - CV FPV</title>
+    <style>
+        /* --- CORE STYLES --- */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; font-family: 'Segoe UI', Tahoma, sans-serif; user-select: none; touch-action: none; -webkit-user-select: none; }
+        #game-canvas { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; }
+        
+        /* UI Styles */
+        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; display: none; }
+        .crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; border: 2px solid rgba(0, 255, 255, 0.8); border-radius: 50%; box-shadow: 0 0 10px cyan; }
+        .crosshair::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 4px; height: 4px; background: cyan; }
+        
+        #player-health-container { position: absolute; top: 20px; left: 20px; width: 200px; height: 20px; background: rgba(0,0,0,0.5); border: 2px solid #fff; border-radius: 5px; }
+        #player-health-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #00ff00, #00aa00); transition: width 0.2s; }
+        
+        #boss-health-container { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); width: 50%; height: 30px; background: #330000; border: 3px solid red; display: none; border-radius: 10px; overflow: hidden;}
+        #boss-health-fill { width: 100%; height: 100%; background: red; transition: width 0.2s; }
+        #boss-name { position: absolute; top: 115px; left: 50%; transform: translateX(-50%); color: #ff4444; font-weight: bold; font-size: 20px; text-shadow: 0 0 10px red; display: none; text-align: center; width: 100%; text-transform: uppercase;}
+
+        #status-text { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); color: #00ffaa; font-size: 40px; font-weight: bold; text-shadow: 0 0 20px #00ffaa; text-align: center; opacity: 0; transition: opacity 0.5s; width: 100%; z-index: 20;}
+
+        /* Radar Minimap */
+        #radar-canvas { position: absolute; bottom: 20px; left: 20px; border-radius: 50%; background: rgba(0, 40, 40, 0.4); border: 2px solid #00ffff; box-shadow: 0 0 15px rgba(0, 255, 255, 0.5); width: 150px; height: 150px;}
+
+        /* CV Popups (en vol) */
+        #cv-popup { position: absolute; top: 12%; left: 50%; transform: translateX(-50%); width: 80%; max-width: 600px; background: rgba(0, 20, 40, 0.85); border: 2px solid #00ffff; border-radius: 15px; padding: 20px; color: white; box-shadow: 0 0 30px rgba(0, 255, 255, 0.5); text-align: center; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; z-index: 15; backdrop-filter: blur(5px);}
+        #cv-popup h2 { color: #00ffff; margin-top: 0; font-size: 28px; text-transform: uppercase; text-shadow: 0 0 10px cyan;}
+        #cv-popup p { font-size: 18px; line-height: 1.5; margin: 10px 0; color: #ddd;}
+        .highlight { color: #ffaa00; font-weight: bold; }
+
+        /* Full CV Modal (Fin) */
+        #full-cv-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 50; overflow-y: auto; pointer-events: auto; padding: 40px 20px; box-sizing: border-box; }
+        .cv-wrapper { max-width: 800px; margin: 0 auto; background: #fff; color: #333; padding: 40px; border-radius: 10px; box-shadow: 0 0 50px rgba(0, 255, 255, 0.5); font-family: 'Segoe UI', Arial, sans-serif;}
+        .cv-header { text-align: center; border-bottom: 3px solid #00aaaa; padding-bottom: 20px; margin-bottom: 20px; }
+        .cv-header h1 { margin: 0; font-size: 40px; color: #222; }
+        .cv-header h3 { margin: 10px 0; color: #00aaaa; font-size: 24px; }
+        .cv-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
+        .cv-section h4 { color: #00aaaa; border-bottom: 1px solid #ccc; padding-bottom: 5px; font-size: 20px; margin-top: 0;}
+        .cv-item { margin-bottom: 15px; }
+        .cv-item strong { display: block; font-size: 16px; color: #222; }
+        .cv-item span { color: #666; font-size: 14px; display: block; margin-bottom: 5px;}
+        .tag { display: inline-block; background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 13px; margin: 2px; border: 1px solid #ddd;}
+        
+        .download-btn { display: block; width: 250px; margin: 30px auto 0; padding: 15px; background: #00aaaa; color: white; text-align: center; font-size: 20px; font-weight: bold; border: none; border-radius: 30px; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(0,170,170,0.4); text-decoration: none;}
+        .download-btn:hover { background: #008888; transform: scale(1.05); }
+
+        #controls-ui { position: absolute; bottom: 20px; right: 20px; color: #fff; font-size: 14px; font-weight: bold; text-shadow: 1px 1px 2px #000; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 10px; border: 1px solid cyan; text-align: left;}
+        #controls-ui span { color: #00ffff; }
+
+        #start-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #001a1a, #000); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; color: white; text-align: center; padding: 20px; box-sizing: border-box; }
+        h1 { font-size: clamp(30px, 6vw, 60px); color: #00ffff; text-shadow: 0 0 30px #00ffff; margin-bottom: 5px; text-transform: uppercase;}
+        p { font-size: clamp(14px, 3vw, 20px); margin: 8px 0; color: #ddd; }
+        .objective-text { background: rgba(0, 255, 255, 0.1); border: 1px solid cyan; padding: 15px; border-radius: 10px; max-width: 600px; line-height: 1.5; color: #fff; font-size: 18px; margin: 20px 0;}
+        .btn { margin-top: 15px; padding: 15px 40px; font-size: clamp(18px, 4vw, 28px); font-weight: 900; color: #000; background: #00ffff; border: none; border-radius: 40px; cursor: pointer; transition: 0.2s; box-shadow: 0 0 30px #00ffff; }
+        .btn:hover { transform: scale(1.05); background: #fff;}
+        
+        #damage-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 50%, red 100%); opacity: 0; pointer-events: none; transition: opacity 0.1s; z-index: 15; }
+        #speed-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 20%, rgba(0, 255, 255, 0.1) 80%); opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 12; }
+
+        /* --- CONTROLES MOBILES RESPONSIVES --- */
+        #mobile-controls { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 11; }
+        .joystick-zone { position: absolute; bottom: 40px; width: 140px; height: 140px; background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 50%; pointer-events: auto; touch-action: none; }
+        #joy-left { left: 40px; }
+        #joy-right { right: 40px; }
+        .stick { position: absolute; top: 50%; left: 50%; width: 60px; height: 60px; background: rgba(0, 255, 255, 0.4); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; box-shadow: 0 0 10px cyan; }
+        .action-btns { position: absolute; bottom: 200px; right: 30px; display: flex; flex-direction: column; gap: 20px; pointer-events: auto; }
+        .action-btn { width: 70px; height: 70px; background: rgba(0,0,0,0.6); border: 2px solid cyan; border-radius: 50%; color: cyan; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 0 10px cyan; user-select: none; touch-action: none; }
+        .action-btn:active { background: cyan; color: black; transform: scale(0.95); }
+        #btn-shoot { border-color: red; color: red; box-shadow: 0 0 15px red; background: rgba(50,0,0,0.5); }
+        #btn-shoot:active { background: red; color: white; }
+
+        @media (min-width: 768px) {
+            #player-health-container { width: 300px; height: 30px; }
+            #controls-ui { bottom: 30px; right: 30px; font-size: 16px; }
+            #status-text { font-size: 60px; }
+            .cv-grid { grid-template-columns: 1fr 2fr; }
+        }
+        @media (max-width: 767px) {
+            .cv-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Print Settings for Final CV */
+        @media print {
+            body * { visibility: hidden; }
+            #full-cv-modal, #full-cv-modal * { visibility: visible; }
+            #full-cv-modal { position: absolute; left: 0; top: 0; background: white; width: 100%; height: auto; overflow: visible; padding: 0;}
+            .cv-wrapper { box-shadow: none; max-width: 100%; padding: 0; }
+            .download-btn { display: none; }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+    <div id="start-screen">
+        <h1>Corentin Chan</h1>
+        <h2 style="color: white; margin-top: 0; font-weight: normal;">Développeur Full Stack</h2>
+        
+        <div class="objective-text">
+            <strong>🎯 OBJECTIF :</strong> Aidez-vous du radar pour trouver et traverser les 4 anneaux dispersés sur la carte. Invoquez le Dragon recruteur, esquivez ses tirs et battez-le pour débloquer mon CV !
+        </div>
+
+        <div id="instructions-pc" style="margin-top: 10px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; text-align: left; display: inline-block;">
+            <p><strong>Z, S, Q, D</strong> : Avancer, Reculer, Tourner</p>
+            <p><strong>Souris</strong> : Diriger la vue | <strong>Clic ou Entrée</strong> : Tirer</p>
+            <p><strong>Espace</strong> : Boost | <strong>E</strong> : Tonneau (Esquive les tirs)</p>
+        </div>
+        <div id="instructions-mobile" style="display: none; margin-top: 15px;">
+            <p><strong>Joysticks :</strong> Voler</p>
+            <p><strong>Bouton ROUGE :</strong> TIRER | <strong>Bouton ROLL :</strong> Esquiver</p>
+        </div>
+        <button class="btn" id="start-btn">DÉCOLLAGE</button>
+    </div>
+
+    <div id="ui-layer">
+        <div id="player-health-container">
+            <div id="player-health-bar"></div>
+            <div style="position: absolute; width: 100%; text-align: center; top:5px; font-size: 14px; font-weight: bold; color: white; text-shadow: 1px 1px 1px black;">BOUCLIER DRONE</div>
+        </div>
+        
+        <div id="boss-health-container"><div id="boss-health-fill"></div></div>
+        <div id="boss-name">⚠️ DRAGON RECRUTEUR EN APPROCHE ⚠️</div>
+        
+        <div id="status-text">GO GO GO !</div>
+        
+        <div id="cv-popup">
+            <h2 id="cv-popup-title">Titre</h2>
+            <div id="cv-popup-content">Contenu</div>
+        </div>
+
+        <canvas id="radar-canvas" width="150" height="150"></canvas>
+
+        <div id="controls-ui">
+            <span>Z</span> : Avancer<br>
+            <span>Souris</span> : Diriger<br>
+            <span>Espace</span> : Boost<br>
+            <span>Clic / Entrée</span> : Tirer<br>
+            <span>E</span> : Tonneau (Esquive)
+        </div>
+        <div class="crosshair"></div>
+        <div id="speed-lines"></div>
+    </div>
+    
+    <div id="damage-overlay"></div>
+
+    <!-- COMMANDES MOBILES RESPONSIVES -->
+    <div id="mobile-controls">
+        <div id="joy-left" class="joystick-zone"><div class="stick" id="stick-left"></div></div>
+        <div id="joy-right" class="joystick-zone"><div class="stick" id="stick-right"></div></div>
+        <div class="action-btns">
+            <div class="action-btn" id="btn-shoot">TIR</div>
+            <div class="action-btn" id="btn-boost">BOOST</div>
+            <div class="action-btn" id="btn-roll">ROLL</div>
+        </div>
+    </div>
+
+    <!-- MODAL CV COMPLET -->
+    <div id="full-cv-modal">
+        <div class="cv-wrapper">
+            <div class="cv-header">
+                <h1>Corentin Chan</h1>
+                <h3>Développeur Full Stack</h3>
+            </div>
+            
+            <div class="cv-grid">
+                <!-- Colonne Gauche -->
+                <div class="cv-left">
+                    <div class="cv-section">
+                        <h4>📍 Infos & Contact</h4>
+                        <p>Samois-sur-Seine, Île-de-France<br>🚗 Permis B | 👤 34 ans</p>
+                        <p>✉ chancorentin@hotmail.com<br>📞 07 50 58 11 77</p>
+                    </div>
+                    
+                    <div class="cv-section" style="margin-top: 30px;">
+                        <h4>💻 Compétences</h4>
+                        <div class="cv-item">
+                            <strong>Frontend</strong>
+                            <div style="margin-top: 5px;">
+                                <span class="tag">React</span> <span class="tag">Angular</span> <span class="tag">HTML/CSS/JS</span>
+                            </div>
+                        </div>
+                        <div class="cv-item">
+                            <strong>Backend</strong>
+                            <div style="margin-top: 5px;">
+                                <span class="tag">Node.js</span> <span class="tag">PHP</span> <span class="tag">Python</span>
+                                <span class="tag">MySQL</span> <span class="tag">PostgreSQL</span> <span class="tag">Prisma</span>
+                            </div>
+                        </div>
+                        <div class="cv-item">
+                            <strong>Autres & Langues</strong>
+                            <div style="margin-top: 5px;">
+                                <span class="tag">C/C++</span> <span class="tag">Français</span> <span class="tag">Anglais</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="cv-section" style="margin-top: 30px;">
+                        <h4>👤 Profil</h4>
+                        <p style="font-size: 14px; color: #444; line-height: 1.6;">Après plus de 5 ans d’expérience en tant qu’ingénieur hardware, je me suis orienté vers le développement web full stack à la suite d’une formation spécialisée et d’un stage. Passionné par les nouvelles technologies, j’ai également lancé un site web dédié à la communauté drone.</p>
+                    </div>
+                </div>
+                
+                <!-- Colonne Droite -->
+                <div class="cv-right">
+                    <div class="cv-section">
+                        <h4>💼 Expérience Professionnelle</h4>
+                        <div class="cv-item">
+                            <strong>Développeur Full Stack Web</strong>
+                            <span>2026 (2 mois) | Ilaria Digital School</span>
+                            <p style="font-size: 14px; margin-top: 5px; color: #444;">Développement d'une plateforme E-learning. Ajout et suppression de vidéos, création et consultation d'un calendrier, implémentation du paiement par Stripe, gestion de panier.</p>
+                        </div>
+                        <div class="cv-item">
+                            <strong>Ingénieur Hardware</strong>
+                            <span>2017 – 2024 | Lincoln Electric · Valeo · Sagemcom</span>
+                            <p style="font-size: 14px; margin-top: 5px; color: #444;">Conception et validation de cartes électroniques complexes.</p>
+                        </div>
+                    </div>
+
+                    <div class="cv-section" style="margin-top: 30px;">
+                        <h4>🎓 Formation</h4>
+                        <div class="cv-item">
+                            <strong>Développeur Web Full Stack</strong>
+                            <span>2026 | Ilaria Digital School</span>
+                        </div>
+                        <div class="cv-item">
+                            <strong>Master Sciences de l'Ingénieur</strong>
+                            <span>2017 | UPMC (Paris VI)</span>
+                        </div>
+                    </div>
+
+                    <div class="cv-section" style="margin-top: 30px;">
+                        <h4>🚀 Projets Web</h4>
+                        <div class="cv-item">
+                            <strong>Droonity <span class="tag">React</span> <span class="tag">Node.js</span> <span class="tag">Prisma</span></strong>
+                            <span>2026 | droonity.com</span>
+                            <p style="font-size: 14px; margin-top: 5px; color: #444;">Application Communautaire de drones avec Map, portfolio et fil de discussions. Création et recherche de spots, upload de médias, événements, mode user/admin.</p>
+                        </div>
+                        <div class="cv-item">
+                            <strong>Recipe App <span class="tag">React</span> <span class="tag">NodeJS</span></strong>
+                            <span>2026</span>
+                            <p style="font-size: 14px; margin-top: 5px; color: #444;">Plateforme de recettes interactives. Recherche, affichage, création, liste personnalisée, upload d'images, mode user/admin.</p>
+                        </div>
+                        <div class="cv-item">
+                            <strong>Portfolio Vidéo & Projets <span class="tag">HTML/CSS</span> <span class="tag">JS</span> <span class="tag">PHP</span></strong>
+                            <span>2024 | gokhanprods.rf.gd</span>
+                            <p style="font-size: 14px; margin-top: 5px; color: #444;">Affichage de vidéos et photos, mini-jeux Javascript.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="download-btn" onclick="window.print()">🖨️ Imprimer / PDF CV</button>
+        </div>
+    </div>
+
+    <script>
+        // --- DONNÉES DU CV POUR LES POPUPS (4 ANNEAUX) ---
+        const cvSections =[
+            {
+                title: "1. Profil & Parcours",
+                content: "Ingénieur Hardware (5 ans) converti en <span class='highlight'>Développeur Web Full Stack</span>.<br><br>Passionné de drones et de nouvelles technologies."
+            },
+            {
+                title: "2. Compétences Techniques",
+                content: "<span class='highlight'>Frontend:</span> React, Angular, HTML/CSS/JS<br><span class='highlight'>Backend:</span> Node.js, PHP, Python, Prisma, SQL<br><span class='highlight'>Autre:</span> C/C++, Anglais courant"
+            },
+            {
+                title: "3. Expériences",
+                content: "<strong>2026 :</strong> Développeur Web (Plateforme E-learning, Paiement Stripe).<br><strong>2017 - 2024 :</strong> Ingénieur Hardware (Valeo, Sagemcom, Lincoln Electric)."
+            },
+            {
+                title: "4. Projets Web",
+                content: "🚁 <strong>Droonity</strong> (App Drone React/Node.js)<br>🍳 <strong>Recipe App</strong> (Plateforme interactive)<br>🖥️ <strong>Portfolio 3D</strong> (HTML/CSS/JS)"
+            }
+        ];
+
+        // --- 0. GESTION MOBILE ---
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        if (isTouchDevice) {
+            document.getElementById('instructions-pc').style.display = 'none';
+            document.getElementById('instructions-mobile').style.display = 'block';
+            document.getElementById('controls-ui').style.display = 'none';
+        }
+
+        // --- 1. MOTEUR 3D ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 15000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444466, 1.2); 
+        scene.add(hemiLight);
+        const sunLight = new THREE.DirectionalLight(0xffffff, 1.5); 
+        sunLight.position.set(1000, 2000, 1000);
+        scene.add(sunLight);
+
+        // --- 2. BIOMES & PARTICULES ---
+        const biomes =[
+            { type: 'forest',   sky: 0x0a1a2a, ground: 0x0a2211, fog: 0.0003, snow: false },
+            { type: 'desert',   sky: 0xffaa55, ground: 0xdd8822, fog: 0.0002, snow: false },
+            { type: 'ice',      sky: 0x88aacc, ground: 0xccddff, fog: 0.0005, snow: true }
+        ];
+        let currentBiome = biomes[0];
+
+        // Neige
+        const particleCount = 2000;
+        const particleGeo = new THREE.BufferGeometry();
+        const particlePos = new Float32Array(particleCount * 3);
+        const particleVel =[];
+        for(let i=0; i<particleCount; i++){
+            particlePos[i*3] = (Math.random()-0.5)*3000;
+            particlePos[i*3+1] = Math.random()*2000;
+            particlePos[i*3+2] = (Math.random()-0.5)*3000;
+            particleVel.push({ y: Math.random()*1.5+0.5, x: (Math.random()-0.5)*0.5 });
+        }
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
+        const particleMat = new THREE.PointsMaterial({color: 0xffffff, size: 5, transparent: true, opacity: 0.8});
+        const particleSystem = new THREE.Points(particleGeo, particleMat);
+        scene.add(particleSystem);
+
+        const terrainGeo = new THREE.PlaneGeometry(20000, 20000, 64, 64);
+        terrainGeo.rotateX(-Math.PI / 2);
+        const terrainMat = new THREE.MeshStandardMaterial({ flatShading: true, roughness: 1, color: 0x0a2211 });
+        const terrain = new THREE.Mesh(terrainGeo, terrainMat);
+        scene.add(terrain);
+
+        function getTerrainHeight(x, z, type) {
+            if (type === 'desert') return Math.sin(x/500)*Math.cos(z/500)*350 + Math.sin(x/150)*50; 
+            if (type === 'ice') return Math.sin(x/250)*100 + Math.cos(z/250)*100 + Math.sin(x/600)*200; 
+            return Math.sin(x/400)*Math.cos(z/400)*400 + Math.sin(x/150)*80; // Forest
+        }
+
+        // Arbres décoratifs
+        const trunkGeo = new THREE.CylinderGeometry(4, 4, 30);
+        const leavesGeo = new THREE.ConeGeometry(15, 60, 5); leavesGeo.translate(0, 35, 0); 
+        const iTrunk = new THREE.InstancedMesh(trunkGeo, new THREE.MeshStandardMaterial({color: 0x443322}), 3000);
+        const iLeaves = new THREE.InstancedMesh(leavesGeo, new THREE.MeshStandardMaterial({color: 0x228822}), 3000);
+        scene.add(iTrunk); scene.add(iLeaves);
+
+        // --- 3. DRONE ---
+        const playerRig = new THREE.Group(); scene.add(playerRig);
+        const droneGroup = new THREE.Group();
+        droneGroup.add(new THREE.Mesh(new THREE.BoxGeometry(8, 4, 18), new THREE.MeshStandardMaterial({color: 0x111111}))); 
+        const arm = new THREE.Mesh(new THREE.BoxGeometry(20, 1.5, 1.5), new THREE.MeshStandardMaterial({color: 0x111111}));
+        const arm2 = arm.clone(); arm.rotation.y = Math.PI/4; arm2.rotation.y = -Math.PI/4;
+        droneGroup.add(arm); droneGroup.add(arm2);
+        const rotors = [];[{x:7,z:7},{x:-7,z:7},{x:7,z:-7},{x:-7,z:-7}].forEach(p => {
+            const r = new THREE.Mesh(new THREE.CylinderGeometry(4,4,0.1), new THREE.MeshBasicMaterial({color:0xffffff,opacity:0.2,transparent:true}));
+            r.position.set(p.x, 2.2, p.z); rotors.push(r); droneGroup.add(r);
+        });
+        droneGroup.scale.set(1.5, 1.5, 1.5); playerRig.add(droneGroup);
+        camera.position.set(0, 15, 35); playerRig.add(camera);
+
+        // --- 4. GAME LOGIC ---
+        let gates = [], projectiles =[], enemyProjectiles =[];
+        let boss = null;
+        let currentGateIndex = 0, isRacing = false, playerHealth = 100;
+        let velocity = new THREE.Vector3(), direction = new THREE.Vector3();
+        let joyLeft = {x:0,y:0}, joyRight = {x:0,y:0};
+        let yaw = Math.PI, pitch = -0.1, isBoosting = false, isRolling = false, rollAngle = 0;
+        let moveF=0, moveB=0, moveL=0, moveR=0;
+        let popupTimeout = null;
+        
+        const clock = new THREE.Clock();
+
+        function createGate(isActive) {
+            let r = 70; 
+            const mesh = new THREE.Mesh(new THREE.TorusGeometry(r, 6, 16, 32), new THREE.MeshBasicMaterial({color: isActive?0x00ffff:0xffaa00, transparent:true, opacity: isActive?0.9:0.4}));
+            if(isActive) mesh.add(new THREE.PointLight(0x00ffff, 2, 100));
+            return { mesh: mesh, radius: r, passed: false };
+        }
+
+        function createBoss(x,y,z) {
+            const grp = new THREE.Group();
+            const body = new THREE.Mesh(new THREE.TorusKnotGeometry(30, 10, 100, 16), new THREE.MeshStandardMaterial({color: 0xff4400}));
+            grp.add(body);
+            const wings = new THREE.Mesh(new THREE.BoxGeometry(250, 4, 80), new THREE.MeshStandardMaterial({color: 0x660000}));
+            wings.position.y = 30; grp.add(wings);
+
+            grp.position.set(x,y,z); scene.add(grp);
+            return { mesh: grp, hp: 100, maxHp: 100, attackTimer: 0 };
+        }
+
+        function shootLaser() {
+            const l = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 60), new THREE.MeshBasicMaterial({color: 0x00ffff}));
+            l.rotateX(Math.PI/2);
+            l.position.copy(playerRig.position); l.quaternion.copy(playerRig.quaternion);
+            const dir = new THREE.Vector3(); camera.getWorldDirection(dir);
+            l.position.add(dir.clone().multiplyScalar(15));
+            scene.add(l);
+            projectiles.push({mesh: l, vel: dir.multiplyScalar(6000), life: 1.0});
+        }
+
+        function bossAttack(boss) {
+            for(let i=0; i<4; i++) {
+                const p = new THREE.Mesh(new THREE.SphereGeometry(8,8,8), new THREE.MeshBasicMaterial({color:0xffaa00}));
+                p.position.copy(boss.mesh.position); p.position.x += (Math.random()-0.5)*80;
+                const dir = new THREE.Vector3().subVectors(playerRig.position, boss.mesh.position).normalize();
+                dir.x += (Math.random()-0.5)*0.15; dir.y += (Math.random()-0.5)*0.15;
+                scene.add(p); enemyProjectiles.push({mesh: p, vel: dir.multiplyScalar(400), dmg: 10});
+            }
+        }
+
+        function generateCVLevel() {
+            // Choix du biome aléatoire
+            currentBiome = biomes[Math.floor(Math.random() * biomes.length)];
+            scene.background = new THREE.Color(currentBiome.sky);
+            scene.fog = new THREE.FogExp2(currentBiome.sky, currentBiome.fog);
+            terrainMat.color.setHex(currentBiome.ground);
+            
+            // Mise à jour du terrain
+            const pos = terrainGeo.attributes.position;
+            for(let i=0; i<pos.count; i++) pos.setY(i, getTerrainHeight(pos.getX(i), pos.getZ(i), currentBiome.type));
+            pos.needsUpdate = true; terrainGeo.computeVertexNormals();
+
+            // Arbres
+            const dummy = new THREE.Object3D(); dummy.scale.set(0,0,0); dummy.updateMatrix();
+            for(let i=0; i<3000; i++) { iTrunk.setMatrixAt(i, dummy.matrix); iLeaves.setMatrixAt(i, dummy.matrix); }
+            let tIdx = 0;
+            for (let i = 0; i < pos.count; i++) {
+                let x = pos.getX(i), z = pos.getZ(i), y = pos.getY(i);
+                if (Math.abs(x) < 300 && Math.abs(z) < 300) continue; 
+                if (currentBiome.type !== 'desert' && y > -50 && Math.random()>0.9 && tIdx<3000) {
+                    dummy.position.set(x,y+15,z); let s = 0.5+Math.random()*2; dummy.scale.set(s,s,s);
+                    dummy.updateMatrix(); iTrunk.setMatrixAt(tIdx, dummy.matrix); iLeaves.setMatrixAt(tIdx++, dummy.matrix);
+                }
+            }
+            iTrunk.instanceMatrix.needsUpdate=true; iLeaves.instanceMatrix.needsUpdate=true;
+
+            // Nettoyage entités
+            [...gates, ...projectiles, ...enemyProjectiles].forEach(o => scene.remove(o.mesh));
+            if(boss) scene.remove(boss.mesh);
+            gates=[]; projectiles=[]; enemyProjectiles=[]; boss=null;
+            
+            playerHealth = 100; updateHP(); currentGateIndex = 0;
+            playerRig.position.set(0, 300, -200);
+            yaw = Math.PI; pitch = -0.1;
+
+            document.getElementById('boss-health-container').style.display = 'none';
+            document.getElementById('boss-name').style.display = 'none';
+            
+            // Placement ESPACÉ des 4 anneaux
+            let cx=0, cz=500, ang=Math.PI;
+            for(let i=0; i<4; i++) {
+                ang += (Math.random()-0.5)*2.5; // Virages aléatoires
+                cx += Math.sin(ang)*(2000 + Math.random()*1500); // Espacement énorme
+                cz += Math.cos(ang)*(2000 + Math.random()*1500);
+                let y = getTerrainHeight(cx,cz, currentBiome.type) + 200 + Math.random()*200;
+                
+                let g = createGate(i===0);
+                g.mesh.position.set(cx,y,cz); g.mesh.lookAt(cx+Math.sin(ang)*100, y, cz+Math.cos(ang)*100);
+                scene.add(g.mesh); gates.push(g);
+            }
+        }
+
+        function showCVSection(index) {
+            const popup = document.getElementById('cv-popup');
+            document.getElementById('cv-popup-title').innerText = cvSections[index].title;
+            document.getElementById('cv-popup-content').innerHTML = cvSections[index].content;
+            
+            popup.style.transform = 'translate(-50%, 0) scale(1)';
+            popup.style.opacity = 1;
+
+            if(popupTimeout) clearTimeout(popupTimeout);
+            popupTimeout = setTimeout(() => {
+                popup.style.opacity = 0;
+                popup.style.transform = 'translate(-50%, -20px) scale(0.9)';
+            }, 6000);
+        }
+
+        function spawnDragon() {
+            let lastGate = gates[3].mesh;
+            let dirZ = lastGate.position.z - gates[2].mesh.position.z;
+            let dirX = lastGate.position.x - gates[2].mesh.position.x;
+            
+            boss = createBoss(lastGate.position.x + dirX*0.5, lastGate.position.y + 150, lastGate.position.z + dirZ*0.5);
+            
+            document.getElementById('boss-health-container').style.display = 'block';
+            document.getElementById('boss-name').style.display = 'block';
+            document.getElementById('boss-health-fill').style.width = '100%';
+            
+            document.getElementById('status-text').innerText = "DRAGON EN VUE !";
+            document.getElementById('status-text').style.color = "red";
+            document.getElementById('status-text').style.opacity = 1;
+            setTimeout(() => document.getElementById('status-text').style.opacity=0, 4000);
+        }
+
+        function updateHP() {
+            let b = document.getElementById('player-health-bar');
+            b.style.width = Math.max(0, playerHealth)+"%";
+            b.style.background = playerHealth<30?'red':'linear-gradient(90deg, #00ff00, #00aa00)';
+            if(playerHealth<=0) {
+                isRacing = false;
+                document.getElementById('status-text').innerText = "DRONE DÉTRUIT. REDÉMARRAGE...";
+                document.getElementById('status-text').style.color = "red";
+                document.getElementById('status-text').style.opacity = 1;
+                setTimeout(() => {
+                    document.getElementById('status-text').style.opacity = 0;
+                    generateCVLevel(); isRacing = true;
+                }, 3000);
+            }
+        }
+
+        function takeDamage(amount) {
+            playerHealth -= amount; updateHP();
+            document.getElementById('damage-overlay').style.opacity = 0.8;
+            setTimeout(()=>document.getElementById('damage-overlay').style.opacity=0, 200);
+        }
+
+        // --- ANIMATION ---
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = Math.min(clock.getDelta(), 0.1);
+
+            if(currentBiome.snow) {
+                particleSystem.visible = true;
+                const pPos = particleGeo.attributes.position.array;
+                for(let i=0; i<particleCount; i++) {
+                    pPos[i*3+1] -= 300 * delta * particleVel[i].y;
+                    pPos[i*3] += particleVel[i].x * 200 * delta; 
+                    if(pPos[i*3+1] < 0) {
+                        pPos[i*3+1] = camera.position.y + 1000 + Math.random()*1000;
+                        pPos[i*3] = camera.position.x + (Math.random()-0.5)*3000;
+                        pPos[i*3+2] = camera.position.z + (Math.random()-0.5)*3000;
+                    }
+                }
+                particleGeo.attributes.position.needsUpdate = true;
+            } else {
+                particleSystem.visible = false;
+            }
+
+            if(isRacing) {
+                rotors.forEach(r => r.rotation.y += 40 * delta);
+
+                const applyExpo = (val, power = 2) => Math.sign(val) * Math.pow(Math.abs(val), power);
+
+                if (isTouchDevice) {
+                    yaw -= applyExpo(joyRight.x, 2) * 3.5 * delta;
+                    pitch -= applyExpo(joyRight.y, 2) * 2.5 * delta;
+                    pitch = Math.max(-Math.PI/2.2, Math.min(Math.PI/2.2, pitch));
+                    playerRig.rotation.set(pitch, yaw, 0, 'YXZ');
+                }
+
+                velocity.multiplyScalar(1 - (3.5 * delta)); // Friction
+
+                let inputZ = isTouchDevice ? applyExpo(-joyLeft.y, 1.5) : (Number(moveF) - Number(moveB));
+                let inputX = isTouchDevice ? applyExpo(joyLeft.x, 1.5) : (Number(moveR) - Number(moveL));
+                
+                direction.set(inputX, 0, inputZ).normalize();
+
+                let speed = isBoosting ? 6000 : 3000;
+                document.getElementById('speed-lines').style.opacity = isBoosting ? 1 : 0;
+                camera.fov += ((isBoosting?105:75) - camera.fov) * 5 * delta; camera.updateProjectionMatrix();
+
+                // Le drone avance seulement si l'inputZ est pressé
+                if (Math.abs(inputZ) > 0.1 || isBoosting) velocity.z -= direction.z * speed * delta;
+                if (Math.abs(inputX) > 0.1) velocity.x += direction.x * speed * delta; 
+
+                playerRig.translateZ(velocity.z * delta); 
+                playerRig.translateX(velocity.x * delta); 
+                
+                // Maintien altitude minimale (pour éviter de crasher sans rien faire)
+                let ty = getTerrainHeight(playerRig.position.x, playerRig.position.z, currentBiome.type);
+                let targetY = Math.max(ty + 50, playerRig.position.y);
+                if(playerRig.position.y < targetY) velocity.y += 800 * delta;
+                velocity.y -= 250 * delta; // Légère gravité
+                playerRig.translateY(velocity.y * delta);
+                
+                if(playerRig.position.y < ty+10) { playerRig.position.y = ty+10; velocity.y=0; takeDamage(1); }
+
+                // Gestion du tonneau (Roll)
+                if (isRolling) {
+                    rollAngle -= 15 * delta; droneGroup.rotation.z = rollAngle;
+                    if (rollAngle <= -Math.PI * 2) { isRolling = false; droneGroup.rotation.z = 0; }
+                } else {
+                    let tilt = isTouchDevice ? -joyLeft.x : (moveR ? -0.4 : (moveL ? 0.4 : 0));
+                    droneGroup.rotation.z += (tilt - droneGroup.rotation.z) * 5 * delta;
+                    droneGroup.rotation.x = velocity.z * 0.00015; 
+                }
+
+                // Gates Logic
+                if(currentGateIndex < 4) {
+                    let g = gates[currentGateIndex];
+                    if(playerRig.position.distanceTo(g.mesh.position) < g.radius + 30) {
+                        g.passed = true; g.mesh.material.color.setHex(0x333333); g.mesh.material.opacity = 0.2;
+                        if(g.mesh.children[0]) g.mesh.remove(g.mesh.children[0]);
+                        
+                        showCVSection(currentGateIndex);
+                        currentGateIndex++;
+                        
+                        if(currentGateIndex < 4) {
+                            gates[currentGateIndex].mesh.material.color.setHex(0x00ffff);
+                            gates[currentGateIndex].mesh.material.opacity = 0.9;
+                            gates[currentGateIndex].mesh.add(new THREE.PointLight(0x00ffff, 2, 100));
+                        } else {
+                            setTimeout(spawnDragon, 2000);
+                        }
+                    }
+                }
+
+                // Boss Logic
+                if(boss) {
+                    boss.mesh.lookAt(playerRig.position);
+                    boss.attackTimer += delta;
+                    if(boss.attackTimer > 1.0) { 
+                        bossAttack(boss); boss.attackTimer = 0;
+                    }
+                }
+
+                // Projectiles Player
+                for(let i=projectiles.length-1; i>=0; i--) {
+                    let p = projectiles[i]; p.mesh.position.add(p.vel.clone().multiplyScalar(delta)); p.life -= delta;
+                    let hit = false;
+
+                    if(boss && p.mesh.position.distanceTo(boss.mesh.position) < 100) {
+                        boss.hp -= 10; hit=true;
+                        document.getElementById('boss-health-fill').style.width = (boss.hp/boss.maxHp*100)+"%";
+                        if(boss.hp <= 0) {
+                            scene.remove(boss.mesh); boss = null;
+                            document.getElementById('boss-health-container').style.display='none';
+                            document.getElementById('boss-name').style.display='none';
+                            isRacing = false;
+                            
+                            // AFFICHER CV COMPLET
+                            document.getElementById('status-text').innerText = "CV DÉBLOQUÉ !";
+                            document.getElementById('status-text').style.color = "#00ffaa";
+                            document.getElementById('status-text').style.opacity = 1;
+                            
+                            setTimeout(() => {
+                                document.getElementById('ui-layer').style.display = 'none';
+                                if(isTouchDevice) document.getElementById('mobile-controls').style.display = 'none';
+                                document.getElementById('full-cv-modal').style.display = 'block';
+                            }, 3000);
+                        }
+                    }
+                    if(p.life<=0 || hit) { scene.remove(p.mesh); projectiles.splice(i,1); }
+                }
+
+                // Enemy Projectiles
+                for(let i=enemyProjectiles.length-1; i>=0; i--) {
+                    let p = enemyProjectiles[i]; p.mesh.position.add(p.vel.clone().multiplyScalar(delta));
+                    // L'esquive par tonneau (isRolling = invincibilité)
+                    if(p.mesh.position.distanceTo(playerRig.position) < 20 && !isRolling) {
+                        takeDamage(p.dmg); scene.remove(p.mesh); enemyProjectiles.splice(i,1);
+                    } else if(p.mesh.position.distanceTo(playerRig.position) > 3000) {
+                        scene.remove(p.mesh); enemyProjectiles.splice(i,1);
+                    }
+                }
+
+                // Dessin de la Minimap Radar
+                const ctx = document.getElementById('radar-canvas').getContext('2d');
+                ctx.clearRect(0,0,150,150); 
+                // Background radar
+                ctx.beginPath(); ctx.arc(75,75,70,0,Math.PI*2); ctx.fillStyle = 'rgba(0, 40, 40, 0.4)'; ctx.fill();
+                
+                // Dessin des anneaux sur le radar
+                gates.forEach((g,i) => {
+                    if(g.passed) return;
+                    let dx = g.mesh.position.x - playerRig.position.x;
+                    let dz = g.mesh.position.z - playerRig.position.z;
+                    let ang = Math.atan2(dx,dz) - yaw;
+                    let dist = Math.sqrt(dx*dx+dz*dz);
+                    let r = Math.min(dist/40, 65); // Mise à l'échelle de la distance
+                    ctx.fillStyle = (i===currentGateIndex) ? '#00ffff' : '#aa5500'; 
+                    ctx.beginPath(); ctx.arc(75+Math.sin(ang)*r, 75+Math.cos(ang)*r, i===currentGateIndex?5:3, 0, Math.PI*2); ctx.fill();
+                });
+                
+                // Dessin du boss sur le radar
+                if(boss) {
+                    let dx = boss.mesh.position.x - playerRig.position.x;
+                    let dz = boss.mesh.position.z - playerRig.position.z;
+                    let ang = Math.atan2(dx,dz) - yaw;
+                    let r = Math.min(Math.sqrt(dx*dx+dz*dz)/40, 65);
+                    ctx.fillStyle='red'; ctx.beginPath(); ctx.arc(75+Math.sin(ang)*r, 75+Math.cos(ang)*r, 6, 0, Math.PI*2); ctx.fill();
+                }
+                
+                // Centre du joueur
+                ctx.fillStyle='#fff'; ctx.beginPath(); ctx.moveTo(75,67); ctx.lineTo(80,78); ctx.lineTo(70,78); ctx.fill();
+            }
+            renderer.render(scene, camera);
+        }
+
+        // --- INPUTS ---
+        document.getElementById('start-btn').onclick = () => { 
+            if(!isTouchDevice) document.body.requestPointerLock(); 
+            document.getElementById('start-screen').style.display='none'; 
+            document.getElementById('ui-layer').style.display='block'; 
+            if(isTouchDevice) document.getElementById('mobile-controls').style.display='block';
+            generateCVLevel(); isRacing=true; animate();
+        };
+        
+        document.addEventListener('keydown', (e) => {
+            if(e.code==='KeyW'||e.code==='KeyZ') moveF=1; if(e.code==='KeyS') moveB=1;
+            if(e.code==='KeyA'||e.code==='KeyQ') moveL=1; if(e.code==='KeyD') moveR=1;
+            if(e.code==='Space') isBoosting=true; 
+            if((e.code==='KeyE' || e.key==='e') && !isRolling) { isRolling = true; rollAngle = 0; } 
+            if(e.code==='Enter' || e.code==='NumpadEnter') { if(isRacing) shootLaser(); }
+        });
+        document.addEventListener('keyup', (e) => {
+            if(e.code==='KeyW'||e.code==='KeyZ') moveF=0; if(e.code==='KeyS') moveB=0;
+            if(e.code==='KeyA'||e.code==='KeyQ') moveL=0; if(e.code==='KeyD') moveR=0;
+            if(e.code==='Space') isBoosting=false; 
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isTouchDevice && document.pointerLockElement === document.body) {
+                yaw -= e.movementX * 0.002; pitch -= e.movementY * 0.002;
+                pitch = Math.max(-Math.PI/2.2, Math.min(Math.PI/2.2, pitch));
+                playerRig.rotation.set(pitch, yaw, 0, 'YXZ');
+            }
+        });
+        document.addEventListener('mousedown', () => { if(isRacing) shootLaser(); });
+
+        function handleJoystick(zoneId, stickId, joyData) {
+            const zone = document.getElementById(zoneId);
+            const stick = document.getElementById(stickId);
+            let isActive = false, rect, centerX, centerY;
+            const maxRadius = 40;
+
+            zone.addEventListener('touchstart', (e) => {
+                e.preventDefault(); isActive = true;
+                rect = zone.getBoundingClientRect();
+                centerX = rect.left + rect.width / 2; centerY = rect.top + rect.height / 2;
+                updateStick(e.changedTouches[0]);
+            }, {passive: false});
+
+            zone.addEventListener('touchmove', (e) => {
+                if(!isActive) return; e.preventDefault();
+                updateStick(e.changedTouches[0]);
+            }, {passive: false});
+
+            const reset = (e) => {
+                e.preventDefault(); isActive = false;
+                stick.style.transform = `translate(-50%, -50%)`;
+                joyData.x = 0; joyData.y = 0;
+            };
+            zone.addEventListener('touchend', reset); zone.addEventListener('touchcancel', reset);
+
+            function updateStick(touch) {
+                let dx = touch.clientX - centerX, dy = touch.clientY - centerY;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist > maxRadius) { dx = (dx/dist)*maxRadius; dy = (dy/dist)*maxRadius; }
+                stick.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+                joyData.x = dx / maxRadius; joyData.y = dy / maxRadius;
+            }
+        }
+
+        if (isTouchDevice) {
+            handleJoystick('joy-left', 'stick-left', joyLeft);
+            handleJoystick('joy-right', 'stick-right', joyRight);
+
+            const bindBtn = (id, startCb, endCb) => {
+                const btn = document.getElementById(id);
+                btn.addEventListener('touchstart', (e)=>{e.preventDefault(); startCb();}, {passive:false});
+                btn.addEventListener('touchend', (e)=>{e.preventDefault(); endCb();});
+            };
+            bindBtn('btn-boost', ()=>isBoosting=true, ()=>isBoosting=false);
+            bindBtn('btn-shoot', ()=>shootLaser(), ()=>{});
+            bindBtn('btn-roll', ()=>{ if(!isRolling){isRolling=true; rollAngle=0;} }, ()=>{});
+        }
+
+        window.onresize = () => { camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); };
+    </script>
+</body>
+</html>

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="fr" x-data="{ activeProject: null, activeExp: 'ilaria_exp', showHardware: false }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Chan Corentin | Ingénieur Hardware & Full Stack</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #030712; color: #f3f4f6; scroll-behavior: smooth; }
+        .glass { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .gradient-blue { background: linear-gradient(90deg, #3b82f6, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .exp-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .exp-card:hover { transform: translateX(8px); background: rgba(255,255,255,0.02); }
+        /* Reset hover effect on mobile to prevent sticky states */
+        @media (max-width: 768px) { .exp-card:hover { transform: none; } }
+        [x-cloak] { display: none !important; }
+        .project-img { width: 100%; height: 220px; object-fit: cover; border-radius: 1.5rem; transition: transform 0.5s; }
+        .line-glow { height: 1px; background: linear-gradient(90deg, transparent, #3b82f6, transparent); opacity: 0.3; }
+        input, textarea { background: rgba(255,255,255,0.03) !important; border: 1px solid rgba(255,255,255,0.1) !important; }
+        input:focus, textarea:focus { border-color: #3b82f6 !important; outline: none; }
+    </style>
+</head>
+<body class="pb-24 md:pb-0">
+
+    <!-- NAVIGATION HEADER -->
+    <nav class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-[95%] max-w-5xl">
+        <div class="glass rounded-full px-6 md:px-8 py-4 flex justify-between items-center shadow-2xl">
+            <div class="font-extrabold tracking-tighter text-xl uppercase italic">Chan <span class="text-blue-500">Corentin</span></div>
+            <div class="hidden lg:flex space-x-8 font-bold text-[10px] uppercase tracking-[0.2em]">
+                <a href="#projets" class="hover:text-blue-400 transition">Projets</a>
+                <a href="#experiences" class="hover:text-blue-400 transition">Expériences</a>
+                <a href="#formations" class="hover:text-blue-400 transition">Cursus</a>
+                <a href="#contact" class="hover:text-blue-400 transition">Contact</a>
+            </div>
+            <a href="#contact" class="bg-blue-600 text-white px-6 py-2 rounded-full text-[10px] font-black hover:scale-105 transition shadow-lg shadow-blue-600/30">HIRE ME</a>
+        </div>
+    </nav>
+
+    <!-- MINI NAV MOBILE -->
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-[90%] lg:hidden">
+        <div class="glass rounded-2xl px-4 py-4 flex justify-between items-center shadow-2xl backdrop-blur-xl bg-black/80">
+            <a href="#projets" class="flex flex-col items-center text-slate-400 hover:text-blue-500 transition">
+                <i class="fa-solid fa-layer-group mb-1 text-lg"></i>
+                <span class="text-[8px] font-bold uppercase tracking-wider">Projets</span>
+            </a>
+            <a href="#experiences" class="flex flex-col items-center text-slate-400 hover:text-blue-500 transition">
+                <i class="fa-solid fa-briefcase mb-1 text-lg"></i>
+                <span class="text-[8px] font-bold uppercase tracking-wider">Exp</span>
+            </a>
+            <a href="#formations" class="flex flex-col items-center text-slate-400 hover:text-blue-500 transition">
+                <i class="fa-solid fa-graduation-cap mb-1 text-lg"></i>
+                <span class="text-[8px] font-bold uppercase tracking-wider">Cursus</span>
+            </a>
+            <a href="#contact" class="flex flex-col items-center text-blue-500 hover:text-white transition">
+                <i class="fa-solid fa-paper-plane mb-1 text-lg"></i>
+                <span class="text-[8px] font-bold uppercase tracking-wider">Contact</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="min-h-screen flex flex-col justify-center items-center px-6 pt-20 text-center">
+        <div class="inline-block px-4 py-1.5 mb-8 glass rounded-full text-blue-400 text-[10px] font-bold tracking-[0.2em] uppercase">
+            Ile De France • Ingénieur Hardware & Web
+        </div>
+        <h1 class="text-4xl md:text-9xl font-black mb-8 tracking-tighter leading-[0.9]">
+            Dévellopeur <br><span class="gradient-blue"> Full-stack Web</span>
+        </h1>
+        
+<div class="max-w-2xl mx-auto glass p-6 md:p-8 rounded-3xl mb-12 border border-blue-500/20 text-left relative">
+    
+<span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#030712] px-3 text-[10px] font-black tracking-widest text-blue-500 uppercase">
+            Profil
+    </span>
+
+    <p class="text-slate-300 text-sm md:text-base font-light leading-relaxed tracking-wide">
+        Ingénieur de formation (Master UPMC) avec plus de 5 ans d'expérience en conception hardware 
+        (Valeo, Sagemcom, Lincoln Electric), en reconversion vers le développement web full stack.
+    </p>
+
+    <!-- <p class="text-slate-300 text-sm md:text-base font-light leading-relaxed tracking-wide mt-4">
+        Première expérience professionnelle réussie en stage sur une plateforme Angular / Node.js, 
+        ainsi qu’un projet déployé sur VPS avec utilisateurs en React / Node.js.
+    </p> -->
+
+</div>
+
+        <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+            <a href="#projets" class="px-10 py-5 bg-white text-black font-black rounded-2xl hover:bg-blue-50 transition uppercase text-xs tracking-widest text-center">Voir Projets</a>
+            <a href="#experiences" class="px-10 py-5 glass font-bold rounded-2xl hover:bg-white/5 transition uppercase text-xs tracking-widest text-center">Mon Parcours</a>
+        </div>
+    </section>
+
+    <!-- SECTION PROJETS -->
+    <section id="projets" class="py-16 md:py-24 px-6 max-w-6xl mx-auto">
+        <h2 class="text-center font-black text-3xl md:text-4xl mb-12 md:mb-16 italic tracking-tight">Réalisations <span class="text-blue-500">Web</span></h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-8">
+            <!-- Projet 1 -->
+            <div @click="activeProject = (activeProject === 'droonity' ? null : 'droonity')" class="glass p-5 rounded-[2.5rem] cursor-pointer group hover:border-blue-500/30 transition relative">
+                <img src="https://droonity.com/assets/shareimage-Cs5m4J71.png" class=" hidden md:block project-img group-hover:scale-105">
+                <h3 class="text-lg font-bold mt-1 md:mt-4">Droonity</h3>
+                <p class="text-blue-500 text-[10px] font-bold uppercase tracking-widest mt-0 z-10 relative">
+                    <a href="https://droonity.com" target="_blank" rel="noopener noreferrer" @click.stop class="hover:text-white transition inline-flex items-center gap-1">droonity.com <i class="fa-solid fa-arrow-up-right-from-square text-[8px]"></i></a>
+                </p>
+                <p class="md:hidden text-[9px] text-slate-500 mt-2 italic flex items-center gap-1"><i class="fa-solid fa-touch-app"></i> Toucher pour détails</p>
+            </div>
+            
+            <!-- Projet 2 -->
+            <div @click="activeProject = (activeProject === 'recettes' ? null : 'recettes')" class="glass p-5 rounded-[2.5rem] cursor-pointer group hover:border-blue-500/30 transition relative">
+                <img src="https://corentinchan.de/background2.webp" class=" hidden md:block project-img group-hover:scale-105">
+                <h3 class="text-lg font-bold mt-1 md:mt-4">Recettes Interactives</h3>
+                <p class="text-blue-500 text-[10px] font-bold uppercase tracking-widest mt-0 z-10 relative">
+                    <a href="https://corentinchan.de" target="_blank" rel="noopener noreferrer" @click.stop class="hover:text-white transition inline-flex items-center gap-1">corentinchan.de <i class="fa-solid fa-arrow-up-right-from-square text-[8px]"></i></a>
+                </p>
+            </div>
+
+            <!-- Projet 3 -->
+            <div @click="activeProject = (activeProject === 'portfolio' ? null : 'portfolio')" class="glass p-5 rounded-[2.5rem] cursor-pointer group hover:border-blue-500/30 transition relative">
+                <img src="https://gokhanprods.rf.gd/gokh/img/headergokhanprod.png" class="hidden md:block project-img group-hover:scale-105">
+                <h3 class="text-lg font-bold mt-1 md:mt-4">Portfolio Vidéos & Loisirs</h3>
+                <p class="text-blue-500 text-[10px] font-bold uppercase tracking-widest mt-0 z-10 relative">
+                    <a href="http://gokhanprods.rf.gd" target="_blank" rel="noopener noreferrer" @click.stop class="hover:text-white transition inline-flex items-center gap-1">gokhanprods.rf.gd <i class="fa-solid fa-arrow-up-right-from-square text-[8px]"></i></a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Détails Projets -->
+        <div class="m-2 mt-4 md:mt-8 md:my-0 transition-all duration-500" id="detailsProject">
+            
+            <!-- Détail Projet 1 -->
+            <div x-show="activeProject === 'droonity'" x-cloak x-transition class="glass p-6 md:p-8 rounded-[2.5rem] bg-indigo-600/5 border-indigo-500/20">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-center">
+                    <div class="order-2 md:order-1">
+                        <h4 class="text-2xl font-black mb-4 uppercase">Droonity (Projet Phare)</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">Application communautaire de drones : carte interactive de spots, portfolios photo/video, évènements, chat, threads, mode user/admin. Utilisation de l’API leaflet pour la Map, et données geoJSON pour zones de restrictions.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-white/5 rounded-full text-[10px] font-black uppercase">React</span>
+                            <span class="px-3 py-1 bg-white/5 rounded-full text-[10px] font-black uppercase">Node.js</span>
+                            <span class="px-3 py-1 bg-white/5 rounded-full text-[10px] font-black uppercase">Prisma / PostgreSQL</span>
+                            <span class="px-3 py-1 bg-white/5 rounded-full text-[10px] font-black uppercase">Tailwind</span>
+                        </div>
+                        <div class="mt-6 flex items-center gap-4">
+                            <a href="https://droonity.com" target="_blank" rel="noopener noreferrer" class="bg-blue-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-blue-500 transition inline-flex items-center gap-2">Voir le site <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">2026</p>
+                        </div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1555664424-778a1e5e1b48?auto=format&fit=crop&q=80&w=600" class="rounded-3xl border border-white/10 shadow-2xl w-full order-1 md:order-2">
+                </div>
+            </div>
+
+            <!-- Détail Projet 2 -->
+            <div x-show="activeProject === 'recettes'" x-cloak x-transition class="glass p-6 md:p-8 rounded-[2.5rem] bg-green-600/5 border-green-500/20">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-center">
+                    <div class="order-2 md:order-1">
+                        <h4 class="text-2xl font-black mb-4 uppercase">Plateforme de recettes interactives</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">Recherche, création et affichage de recettes, listes personnalisées, mode user/admin, upload d'images. Utilisation API externe pour récupérer des recettes.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-white/5 rounded-full text-[10px] font-black uppercase">React</span>
+                            <span class="px-3 py-1 bg-white/5 rounded-full text-[10px] font-black uppercase">Node.js</span>
+                            <span class="px-3 py-1 bg-white/5 rounded-full text-[10px] font-black uppercase">Bootstrap</span>
+                        </div>
+                        <div class="mt-6 flex items-center gap-4">
+                            <a href="https://corentinchan.de" target="_blank" rel="noopener noreferrer" class="bg-blue-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-blue-500 transition inline-flex items-center gap-2">Voir le site <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">2025</p>
+                        </div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=600" class="rounded-3xl border border-white/10 shadow-2xl w-full order-1 md:order-2">
+                </div>
+            </div>
+
+            <!-- Détail Projet 3 -->
+            <div x-show="activeProject === 'portfolio'" x-cloak x-transition class="glass p-6 md:p-8 rounded-[2.5rem] bg-blue-600/5 border-blue-500/20">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-center">
+                    <div class="order-2 md:order-1">
+                        <h4 class="text-2xl font-black mb-4 uppercase">Portfolio video & projets loisirs</h4>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-6">Affichage de vidéos et photos, listes personnalisées, jeux en JavaScript.</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-white/5 rounded-full text-[10px] font-black uppercase">HTML / CSS</span>
+                            <span class="px-3 py-1 bg-white/5 rounded-full text-[10px] font-black uppercase">JavaScript</span>
+                            <span class="px-3 py-1 bg-white/5 rounded-full text-[10px] font-black uppercase">PHP</span>
+                        </div>
+                        <div class="mt-6 flex items-center gap-4">
+                            <a href="http://gokhanprods.rf.gd" target="_blank" rel="noopener noreferrer" class="bg-blue-600 text-white px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-blue-500 transition inline-flex items-center gap-2">Voir le site <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">2024</p>
+                        </div>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1555664424-778a1e5e1b48?auto=format&fit=crop&q=80&w=600" class="rounded-3xl border border-white/10 shadow-2xl w-full order-1 md:order-2">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION EXPÉRIENCES -->
+    <section id="experiences" class="py-16 md:py-24 px-6 max-w-4xl mx-auto">
+        <h2 class="text-center font-black text-3xl md:text-4xl mb-12 md:mb-16 italic tracking-tight">Expériences <span class="text-blue-500">Professionnelles</span></h2>
+        
+        <div class="space-y-4">
+            
+            <!-- Ilaria Digital School (Stage) -->
+            <div @click="activeExp = (activeExp === 'ilaria_exp' ? null : 'ilaria_exp')" class="exp-card glass p-6 md:p-8 rounded-[2rem] cursor-pointer">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg md:text-xl font-extrabold uppercase tracking-tighter text-blue-400">ILARIA DIGITAL SCHOOL</h3>
+                        <p class="text-slate-300 text-[10px] md:text-xs font-bold uppercase mt-1">Développeur Full Stack (Stage) • 2026 - 2 mois</p>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-blue-500 transition-transform" :class="activeExp === 'ilaria_exp' ? 'rotate-90' : ''"></i>
+                </div>
+                <div x-show="activeExp === 'ilaria_exp'" x-cloak x-transition class="mt-8 pt-8 border-t border-white/5">
+                    <p class="text-blue-400 text-[10px] font-black uppercase mb-4 tracking-[0.2em] italic">Missions :</p>
+                    <ul class="text-sm text-slate-400 space-y-3 leading-relaxed">
+                        <li>• Développement d'une plateforme E-learning.</li>
+                        <li>• Fonctionnalités : gestion de vidéos (ajout/suppression), calendrier et gestion de tâches.</li>
+                        <li>• Intégration paiement Stripe et panier.</li>
+                    </ul>
+                    <p class="mt-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Stack : Angular, Node.js</p>
+                </div>
+            </div>
+
+            <!-- RÉSUMÉ HARDWARE (VISIBLE PAR DEFAUT) AVEC BOUTON INTÉGRÉ -->
+            <div class="glass p-6 md:p-8 rounded-[2rem] border-blue-500/20 bg-blue-900/10 mt-8">
+                <h3 class="text-lg md:text-xl font-extrabold uppercase tracking-tighter">LINCOLN ELECTRIC - VALEO - SAGEMCOM</h3>
+                <p class="text-blue-500 text-[10px] md:text-xs font-bold uppercase mt-1">Ingénieur Hardware • 2017 - 2024</p>
+                <ul class="text-sm text-slate-300 space-y-3 leading-relaxed mt-4 mb-6">
+                    <li>• Conception et validation de cartes électroniques (Dimensionnement, schéma, suivi de routage, prototypage)</li>
+                    <li>• Rédaction de document de justifications design et plan/rapports de tests</li>
+                    <li>• Collaboration avec les équipes software et mécanique</li>
+                </ul>
+                
+                <button @click="showHardware = !showHardware" class="bg-blue-600/20 border border-blue-500/30 text-blue-400 px-6 py-3 rounded-full text-xs font-black uppercase tracking-widest hover:bg-blue-600/40 transition inline-block">
+                    <span x-text="showHardware ? 'Masquer le détail' : 'Voir les expériences Ingénieur Hardware (2017 - 2024)'"></span>
+                </button>
+            </div>
+
+            <!-- BLOC HARDWARE DÉTAILLÉ (MASQUÉ PAR DEFAUT) -->
+            <div x-show="showHardware" x-cloak x-transition class="space-y-4 pt-4">
+                
+                <!-- Thales -->
+                <div @click="activeExp = (activeExp === 'thales' ? null : 'thales')" class="exp-card glass p-6 md:p-8 rounded-[2rem] cursor-pointer">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg md:text-xl font-extrabold uppercase tracking-tighter">Thales AES</h3>
+                            <p class="text-slate-500 text-[10px] md:text-xs font-bold uppercase mt-1">Ingénieur Électronique • 2023</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-500 transition-transform" :class="activeExp === 'thales' ? 'rotate-90' : ''"></i>
+                    </div>
+                    <div x-show="activeExp === 'thales'" x-cloak x-transition class="mt-8 pt-8 border-t border-white/5">
+                        <p class="text-blue-400 text-[10px] font-black uppercase mb-4 tracking-[0.2em] italic">Missions techniques :</p>
+                        <ul class="text-sm text-slate-400 space-y-3 leading-relaxed">
+                            <li>• Travail sur projet aéronautique : Convertisseur 400V/28V.</li>
+                            <li>• Conception carte interconnexion (interfaçage complet des cartes produit).</li>
+                            <li>• Design fonction acquisition tension/courant (Mesure HV par pont diviseur, amplification isolé différentiel, mesure courant HV par LEM et LV par shunt).</li>
+                            <li>• Saisie de schémas, choix des composants, calculs Worst Case et justification de design hardware.</li>
+                        </ul>
+                        <p class="mt-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Outils : Cadence Allegro, LTSpice/Pspice</p>
+                    </div>
+                </div>
+
+                <!-- Valeo -->
+                <div @click="activeExp = (activeExp === 'valeo' ? null : 'valeo')" class="exp-card glass p-6 md:p-8 rounded-[2rem] cursor-pointer">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg md:text-xl font-extrabold uppercase tracking-tighter text-slate-300">Valeo Cergy</h3>
+                            <p class="text-slate-500 text-[10px] md:text-xs font-bold uppercase mt-1">Ingénieur Hardware • 2022-2023</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right text-slate-500 transition-transform" :class="activeExp === 'valeo' ? 'rotate-90' : ''"></i>
+                    </div>
+                    <div x-show="activeExp === 'valeo'" x-cloak x-transition class="mt-8 pt-8 border-t border-white/5">
+                        <ul class="text-sm text-slate-400 space-y-3 leading-relaxed">
+                            <li>• Design carte gateway (6 couches, 1200 composants) pour chargeur OBC Ford 22kW.</li>
+                            <li>• Vérification schémas vs normes IEC_61851 et GBT18487.1-2015.</li>
+                            <li>• Simulations fonctions wake-up, switch alim et mode standby (microcontrôleur basse conso).</li>
+                            <li>• Réalisation de rapports de justification design (worst case, derating, HDC).</li>
+                            <li>• Tests unitaires, debug et modification de schémas pour versions itératives.</li>
+                        </ul>
+                        <p class="mt-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Outils : Simetrix, Zuken</p>
+                    </div>
+                </div>
+
+                <!-- E-Motors -->
+                <div @click="activeExp = (activeExp === 'emotors' ? null : 'emotors')" class="exp-card glass p-6 md:p-8 rounded-[2rem] cursor-pointer">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <div><h3 class="text-lg md:text-xl font-extrabold uppercase tracking-tighter">E-Motors</h3><p class="text-[10px] md:text-xs font-bold mt-1">Validation Électronique • 2021-2022</p></div>
+                        <i class="fa-solid fa-chevron-right transition-transform" :class="activeExp === 'emotors' ? 'rotate-90' : ''"></i>
+                    </div>
+                    <div x-show="activeExp === 'emotors'" x-cloak x-transition class="mt-8 pt-8 border-t border-white/5 text-sm space-y-3">
+                        <p>• Validation de cartes de contrôle sur onduleurs de moteurs électriques.</p>
+                        <p>• Tests : Convertisseurs DC/DC flyback, gate drivers, MCU, bus CAN.</p>
+                        <p>• Focus circuits safety analogiques (Active short circuit, Active Discharge).</p>
+                        <p>• Spécifications de tests End Of Line (EOL) pour cartes et produits finis.</p>
+                    </div>
+                </div>
+
+                <!-- Sagemcom -->
+                <div @click="activeExp = (activeExp === 'sagemcom' ? null : 'sagemcom')" class="exp-card glass p-6 md:p-8 rounded-[2rem] cursor-pointer">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <div><h3 class="text-lg md:text-xl font-extrabold uppercase tracking-tighter">Sagemcom</h3><p class="text-[10px] md:text-xs font-bold mt-1">Ingénieur Électronique • 2021</p></div>
+                        <i class="fa-solid fa-chevron-right transition-transform" :class="activeExp === 'sagemcom' ? 'rotate-90' : ''"></i>
+                    </div>
+                    <div x-show="activeExp === 'sagemcom'" x-cloak x-transition class="mt-8 pt-8 border-t border-white/5 text-sm space-y-3">
+                        <p>• Projet vélo électrique : Conception & validation carte feux arrières et IHM.</p>
+                        <p>• Schéma sous Mentor (XDX Designer) et gestion des règles de routage complexes.</p>
+                        <p>• Qualification ADC, PWM, bus numériques (SPI, CAN) et tests cellules batteries.</p>
+                    </div>
+                </div>
+
+                <!-- Faurecia -->
+                <div @click="activeExp = (activeExp === 'faurecia' ? null : 'faurecia')" class="exp-card glass p-6 md:p-8 rounded-[2rem] cursor-pointer text-slate-500">
+                    <div class="flex justify-between items-center"><h3 class="text-lg md:text-xl font-extrabold uppercase tracking-tighter">Faurecia</h3><i class="fa-solid fa-chevron-right"></i></div>
+                    <div x-show="activeExp === 'faurecia'" x-cloak x-transition class="mt-8 pt-8 border-t border-white/5 text-sm">
+                        Validation et qualification de bancs de tests industriels automobile. Analyse schémas/routage sous Orcad/Cadence. Qualification capteurs, relais, et bus GMSL2.
+                    </div>
+                </div>
+
+                <!-- Lincoln Electric -->
+                <div @click="activeExp = (activeExp === 'lincoln' ? null : 'lincoln')" class="exp-card glass p-6 md:p-8 rounded-[2rem] cursor-pointer text-slate-500">
+                    <div class="flex justify-between items-center"><h3 class="text-lg md:text-xl font-extrabold uppercase tracking-tighter">Lincoln Electric</h3><i class="fa-solid fa-chevron-right"></i></div>
+                    <div x-show="activeExp === 'lincoln'" x-cloak x-transition class="mt-8 pt-8 border-t border-white/5 text-sm space-y-3">
+                        <p>• Conception et tests cycle commande poste de soudure (700 composants).</p>
+                        <p>• Simulation PSIM/LTSPICE (conditionnement capteurs).</p>
+                        <p>• Design régulateur débit de gaz en boucle fermée par MCU.</p>
+                    </div>
+                </div>
+
+                <!-- Centum Adeneo -->
+                <div @click="activeExp = (activeExp === 'centum' ? null : 'centum')" class="exp-card glass p-6 md:p-8 rounded-[2rem] cursor-pointer text-slate-500">
+                    <div class="flex justify-between items-center"><h3 class="text-lg md:text-xl font-extrabold uppercase tracking-tighter">Centum Adeneo</h3><i class="fa-solid fa-chevron-right"></i></div>
+                    <div x-show="activeExp === 'centum'" x-cloak x-transition class="mt-8 pt-8 border-t border-white/5 text-sm">
+                        Validation carte communication ACARS aéronautique civile. Support technique et détection erreurs routage.
+                    </div>
+                </div>
+            </div>
+            <!-- FIN BLOC HARDWARE DÉTAILLÉ -->
+
+        </div>
+    </section>
+
+    <!-- CURSUS SLIM -->
+    <section id="formations" class="py-16 md:py-24 px-6 max-w-6xl mx-auto">
+        <h2 class="text-center font-black text-3xl md:text-4xl mb-12 md:mb-16 italic tracking-tight">Cursus <span class="text-blue-500">Académique</span></h2>
+        <div class="line-glow mb-12"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 text-center">
+            <div class="px-6">
+                <p class="text-[10px] font-black text-blue-500 uppercase mb-2 tracking-widest">2025 - 2026</p>
+                <h4 class="font-bold text-sm uppercase">Développeur Web Full Stack</h4>
+                <p class="text-slate-500 text-xs mt-1">Ilaria Digital School</p>
+            </div>
+            <div class="px-6 border-t md:border-t-0 md:border-l border-white/5 pt-8 md:pt-0">
+                <p class="text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest">2017</p>
+                <h4 class="font-bold text-sm uppercase">Master Sciences de l'Ingénieur</h4>
+                <p class="text-slate-500 text-xs mt-1">UPMC (Paris VI)</p>
+            </div>
+        </div>
+        <div class="line-glow mt-12"></div>
+    </section>
+
+    <!-- SKILLS & EXTRA -->
+    <section class="py-16 md:py-24 px-6 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 text-center md:text-left">
+        <div>
+            <h3 class="text-2xl font-black italic mb-8 uppercase tracking-tighter">Compétences</h3>
+            <div class="space-y-6">
+                <!-- FRONTEND -->
+                <div>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase mb-3 tracking-widest">Frontend</p>
+                    <div class="flex flex-wrap justify-center md:justify-start gap-2 text-[10px] font-black uppercase">
+                        <span class="bg-blue-600/10 text-blue-400 border border-blue-500/20 px-4 py-2 rounded-xl">React</span>
+                        <span class="bg-blue-600/10 text-blue-400 border border-blue-500/20 px-4 py-2 rounded-xl">Angular</span>
+                        <span class="bg-blue-600/10 text-blue-400 border border-blue-500/20 px-4 py-2 rounded-xl">JavaScript </span>
+                        <span class="bg-blue-600/10 text-blue-400 border border-blue-500/20 px-4 py-2 rounded-xl">HTML / CSS</span>
+                        <span class="bg-blue-600/10 text-blue-400 border border-blue-500/20 px-4 py-2 rounded-xl">Tailwind</span>
+                        <span class="bg-blue-600/10 text-blue-400 border border-blue-500/20 px-4 py-2 rounded-xl">Bootstrap</span>
+                    </div>
+                </div>
+                <!-- BACKEND -->
+                <div>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase mb-3 tracking-widest">Backend & BDD</p>
+                    <div class="flex flex-wrap justify-center md:justify-start gap-2 text-[10px] font-black uppercase">
+                        <span class="bg-emerald-600/10 text-emerald-400 border border-emerald-500/20 px-4 py-2 rounded-xl">Node.js</span>
+                        <span class="bg-emerald-600/10 text-emerald-400 border border-emerald-500/20 px-4 py-2 rounded-xl">Express</span>
+                        <span class="bg-emerald-600/10 text-emerald-400 border border-emerald-500/20 px-4 py-2 rounded-xl">PostgreSQL</span>
+                        <span class="bg-emerald-600/10 text-emerald-400 border border-emerald-500/20 px-4 py-2 rounded-xl">Prisma (ORM)</span>
+                        <span class="bg-emerald-600/10 text-emerald-400 border border-emerald-500/20 px-4 py-2 rounded-xl">PHP</span>
+                        <span class="bg-emerald-600/10 text-emerald-400 border border-emerald-500/20 px-4 py-2 rounded-xl">API REST</span>
+                    </div>
+                </div>
+                <!-- CAO HARDWARE -->
+                <div>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase mb-3 tracking-widest">CAO Électronique</p>
+                    <div class="flex flex-wrap justify-center md:justify-start gap-2 text-[10px] font-black uppercase">
+                        <span class="bg-white/5 border border-white/10 px-4 py-2 rounded-xl">Altium, Cadence, Zuken, Xdx Designer</span>
+                        <span class="bg-white/5 border border-white/10 px-4 py-2 rounded-xl">LTSpice, PSIM, Simetrix</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <h3 class="text-2xl font-black italic mb-8 uppercase tracking-tighter">Extra Skills</h3>
+            <div class="glass p-8 rounded-[2.5rem] text-xs font-medium space-y-4 text-left">
+                <div class="flex justify-between border-b border-white/5 pb-3"><span class="text-slate-500 font-black uppercase tracking-widest">Langues</span>
+                    <span><p>Français (courant)</p><p>Anglais (Pro)</p></span></div>
+                <div class="flex flex-col sm:flex-row sm:justify-between border-b border-white/5 pb-3 gap-2">
+                    <span class="text-slate-500 font-black uppercase tracking-widest">Loisirs</span>
+                    <span class="sm:text-right">Drones (Conception, pilotage, montage vidéos), Musique (guitare), Voyages, Cuisine</span>
+                </div>
+                <div class="flex justify-between"><span class="text-slate-500 font-black uppercase tracking-widest">Véhicule</span><span>Permis B</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION CONTACT & CV -->
+    <section id="contact" class="py-16 md:py-24 px-6 max-w-5xl mx-auto text-center">
+        <h3 class="text-3xl md:text-5xl font-black mb-4 tracking-tighter italic uppercase">Contact & CV</h3>
+        <p class="text-slate-400 mb-12 text-sm md:text-base">N'hésitez pas à me contacter ou à explorer mes expériences interactives.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+            
+            <!-- Carte Coordonnées -->
+            <div class="glass p-8 rounded-[2.5rem] border-blue-500/20 space-y-8 flex flex-col justify-center">
+                <h4 class="text-lg font-black uppercase tracking-widest text-slate-300 mb-2">Coordonnées</h4>
+                
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 rounded-full bg-blue-600/20 border border-blue-500/30 text-blue-500 flex items-center justify-center text-xl shrink-0">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Email</p>
+                        <a href="mailto:chancorentin@hotmail.com" class="text-sm md:text-base font-bold text-slate-200 hover:text-blue-400 transition">chancorentin@hotmail.com</a>
+                    </div>
+
+                    
+                              
+                </div>
+
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 rounded-full bg-blue-600/20 border border-blue-500/30 text-blue-500 flex items-center justify-center text-xl shrink-0">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Téléphone</p>
+                        <a href="tel:+33750581177" class="text-sm md:text-base font-bold text-slate-200 hover:text-blue-400 transition">07 50 58 11 77</a>
+                    </div>
+                </div>
+
+                             <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 rounded-full bg-blue-600/20 border border-blue-500/30 text-blue-500 flex items-center justify-center text-xl shrink-0">
+                        <i class="fa-solid fa-home"></i>
+                    </div>
+  
+                    
+                                  <div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Adresse</p>
+                        <p  class="text-sm md:text-base font-bold text-slate-200 hover:text-blue-400 transition">Samois sur Seine, 77920 Fra,ce</a>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Carte Liens CV -->
+            <div class="glass p-8 rounded-[2.5rem] border-blue-500/20 space-y-4">
+                <h4 class="text-lg font-black uppercase tracking-widest text-slate-300 mb-6">Curriculum Vitae</h4>
+                
+                <!-- Lien PDF -->
+                <a href="cv.corentinchan.de/cv-corentin-chan.pdf" target="_blank" class="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 border border-white/10 p-5 rounded-2xl transition group">
+                    <div class="flex items-center gap-4">
+                        <i class="fa-solid fa-file-pdf text-red-400 text-2xl"></i>
+                        <span class="text-xs md:text-sm font-bold uppercase tracking-widest text-slate-200 group-hover:text-white transition">Version PDF classique</span>
+                    </div>
+                    <i class="fa-solid fa-download text-slate-500 group-hover:text-white transition"></i>
+                </a>
+
+                <!-- Lien CV Game 2D -->
+                <a href="https://cv.corentinchan.de/cvgame4.html?i=1" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-between bg-blue-600/10 hover:bg-blue-600/20 border border-blue-500/20 p-5 rounded-2xl transition group">
+                    <div class="flex items-center gap-4">
+                        <i class="fa-solid fa-gamepad text-blue-400 text-2xl"></i>
+                        <span class="text-xs md:text-sm font-bold uppercase tracking-widest text-blue-100 group-hover:text-white transition">CV Game (2D)</span>
+                    </div>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-blue-500 group-hover:text-blue-300 transition"></i>
+                </a>
+
+                <!-- Lien CV Game 3D -->
+                <a href="https://cv.corentinchan.de/cvgame3d.html?i=1" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-between bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-500/20 p-5 rounded-2xl transition group">
+                    <div class="flex items-center gap-4">
+                        <i class="fa-solid fa-cube text-indigo-400 text-2xl"></i>
+                        <span class="text-xs md:text-sm font-bold uppercase tracking-widest text-indigo-100 group-hover:text-white transition">CV Game (3D)</span>
+                    </div>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-indigo-500 group-hover:text-indigo-300 transition"></i>
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="py-10 md:py-20 text-center opacity-20 text-[9px] font-black uppercase tracking-[0.6em] mb-16 md:mb-0">
+        © 2026 Chan Corentin // Engineering & Digital Development
+    </footer>
+
+</body>
+</html>
