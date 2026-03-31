@@ -360,8 +360,8 @@
                 </div>
                 <!-- Remplacement des Emojis par des SVGs Pixel Art -->
                 <div class="battle-sprite" id="enemy-sprite">🕺
-                    <!-- <svg width="80" height="80" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="5" y="2" width="6" height="5" fill="#FFCC99"/><rect x="4" y="1" width="8" height="2" fill="#D8A838"/><rect x="10" y="2" width="2" height="3" fill="#D8A838"/><rect x="6" y="4" width="1" height="1" fill="#000"/><rect x="9" y="4" width="1" height="1" fill="#000"/><rect x="4" y="7" width="8" height="5" fill="#181818"/><rect x="4" y="12" width="3" height="4" fill="#A83030"/><rect x="9" y="12" width="3" height="4" fill="#A83030"/></svg> -->
-    <span style="font-size: 70px;">🕺</span>
+                    <svg width="80" height="80" viewBox="0 0 16 16" style="image-rendering: pixelated;"><rect x="5" y="2" width="6" height="5" fill="#FFCC99"/><rect x="4" y="1" width="8" height="2" fill="#D8A838"/><rect x="10" y="2" width="2" height="3" fill="#D8A838"/><rect x="6" y="4" width="1" height="1" fill="#000"/><rect x="9" y="4" width="1" height="1" fill="#000"/><rect x="4" y="7" width="8" height="5" fill="#181818"/><rect x="4" y="12" width="3" height="4" fill="#A83030"/><rect x="9" y="12" width="3" height="4" fill="#A83030"/></svg>
+    <!-- <span style="font-size: 70px;">🕺</span> -->
                 </div>
             </div>
             
@@ -650,19 +650,55 @@ function typeChar() {
 
 function pickElectronique() {
     if(flagPickBall) return playDialog(["Tu as déjà choisi Electronique !"]);
+    
     playDialog([
         "Vous avez choisi la voie ÉLECTRONIQUE !",
         "..."
     ], () => {
-        entities = entities.filter(e => e.id !== 'ball2' && e.id !== 'ball3');
+        // On retire d'abord uniquement la Pokéball du joueur (au milieu)
+        entities = entities.filter(e => e.id !== 'ball2');
         flagPickBall = true;
-        let rival = { id: 'rival', x: 8, y: 8, interact: ()=>{} };
+        
+        // On fait apparaître le rival tout en bas de la salle (vers la porte)
+        let rival = { id: 'rival', x: 8, y: 11, interact: ()=>{} };
         entities.push(rival);
-        playDialog([
-            "Rival : Hé ! Puisque tu as pris Electronique...",
-            "Moi je prends DANSEUR DE SALSA !",
-            "Le combat commence !"
-        ], () => startBattle('RIVAL'));
+        
+        // On change l'état pour bloquer les contrôles du joueur pendant l'animation
+        rpgState = 'CUTSCENE';
+        
+        // Le chemin pas-à-pas que le rival va emprunter pour contourner le joueur 
+        // et aller vers la Pokéball de droite (x: 9, y: 5)
+        let steps = [
+            {x: 8, y: 10}, {x: 8, y: 9}, {x: 9, y: 9}, 
+            {x: 9, y: 8}, {x: 9, y: 7}, {x: 9, y: 6}, {x: 9, y: 5}
+        ];
+        let stepIdx = 0;
+        
+        function moveRival() {
+            if (stepIdx < steps.length) {
+                // Déplacement visuel du rival
+                rival.x = steps[stepIdx].x;
+                rival.y = steps[stepIdx].y;
+                stepIdx++;
+                setTimeout(moveRival, 100); // Vitesse de marche (200ms par case)
+            } else {
+                // Le rival est arrivé devant la Pokéball
+                setTimeout(() => {
+                    // Il prend la Pokéball Danseur de Salsa (elle disparaît de la table)
+                    entities = entities.filter(e => e.id !== 'ball3');
+                    
+                    // Lancement de la suite des événements
+                    playDialog([
+                        "Rival : Hé ! Puisque tu as pris Electronique...",
+                        "Moi je prends DANSEUR DE SALSA !",
+                        "Le combat commence !"
+                    ], () => startBattle('RIVAL'));
+                }, 400); // Petite pause avant qu'il ne parle
+            }
+        }
+        
+        // Démarre l'animation de marche du rival
+        moveRival(); 
     });
 }
 
